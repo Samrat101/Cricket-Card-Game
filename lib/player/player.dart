@@ -26,7 +26,6 @@ abstract class Player {
       _health = value;
     }
   }
-
   Card playCard();
 }
 
