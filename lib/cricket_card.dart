@@ -8,6 +8,7 @@ class CricketCard implements CricketCardInterface {
   final CardAttribute _matches;
   final CardAttribute _runs;
   final CardAttribute _wickets;
+  final String playerName;
   @override
   CardAttribute get catches => _catches;
   @override
@@ -21,6 +22,7 @@ class CricketCard implements CricketCardInterface {
   @override
   CardAttribute get wickets => _wickets;
   CricketCard({
+    required this.playerName,
     required CardAttribute catches,
     required CardAttribute centuries,
     required CardAttribute halfCenturies,
@@ -33,4 +35,16 @@ class CricketCard implements CricketCardInterface {
         _matches = matches,
         _runs = runs,
         _wickets = wickets;
+
+  factory CricketCard.fromJson(Map<String, dynamic> json) {
+    return CricketCard(
+      playerName: json['player_name'],
+      catches: CardAttribute.fromJson(json['catches']),
+      centuries: CardAttribute.fromJson(json['centuries']),
+      halfCenturies: CardAttribute.fromJson(json['half_centuries']),
+      matches: CardAttribute.fromJson(json['matches']),
+      runs: CardAttribute.fromJson(json['runs']),
+      wickets: CardAttribute.fromJson(json['wickets']),
+    );
+  }
 }
