@@ -1,5 +1,4 @@
 import 'dart:math';
-
 import 'package:flutter/material.dart';
 
 class FlipCard extends StatefulWidget {
@@ -66,7 +65,6 @@ class FlipCardState extends State<FlipCard>
       builder: (_, child) {
         final isHalfWay = _animation.value >= pi / 2;
         final displayText = isHalfWay ? widget.backText : widget.frontText;
-
         return Transform(
           alignment: Alignment.center,
           transform: Matrix4.identity()
@@ -80,12 +78,48 @@ class FlipCardState extends State<FlipCard>
               border: Border.all(color: Colors.black87, width: 2),
               borderRadius: BorderRadius.circular(10),
             ),
-            child: Center(
-              child: Text(
-                displayText,
-                style: const TextStyle(fontSize: 22),
-              ),
-            ),
+            child: _isFront
+                ? SizedBox()
+                : Padding(
+                    padding: const EdgeInsets.all(12.0),
+                    child: Center(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Center(
+                            child: Text(
+                              'Name',
+                              style: const TextStyle(fontSize: 12),
+                            ),
+                          ),
+                          Text(
+                            'Catches: ',
+                            style: const TextStyle(fontSize: 12),
+                          ),
+                          Text(
+                            'Centuries: ',
+                            style: const TextStyle(fontSize: 12),
+                          ),
+                          Text(
+                            'Half Centuries: ',
+                            style: const TextStyle(fontSize: 12),
+                          ),
+                          Text(
+                            'Matched: ',
+                            style: const TextStyle(fontSize: 12),
+                          ),
+                          Text(
+                            'Runs: ',
+                            style: const TextStyle(fontSize: 12),
+                          ),
+                          Text(
+                            'Wickets: ',
+                            style: const TextStyle(fontSize: 12),
+                          )
+                        ],
+                      ),
+                    ),
+                  ),
           ),
         );
       },

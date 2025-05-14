@@ -14,6 +14,7 @@ abstract class Player {
   List<CricketCard> get cards => _cards;
   SpecialMode? get specialMode => _specialMode;
   bool get isSpecialModeActive => specialModeActive;
+  
   void dealCard(List<CricketCard> cards) {
     _cards = cards;
   }

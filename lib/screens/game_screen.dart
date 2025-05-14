@@ -2,7 +2,6 @@ import 'package:cricket_card_game/player/player.dart';
 import 'package:cricket_card_game/screens/cards_screen.dart';
 import 'package:cricket_card_game/screens/mode_selection.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 
 enum SpecialMode {
   powerPlayMode('Power Play Mode'),
@@ -78,15 +77,12 @@ class _GameScreenState extends State<GameScreen> {
     );
   }
 
-  void startGame() {
+  void startGame() async {
+    await _showModeDialog();
     print('Starting game...');
-    // Here you can implement the logic to start the game
-    // Game game  = Game(widget.players);
-    // game.start();
-    _showModeDialog();
   }
 
-  void _showModeDialog() async {
+  _showModeDialog() async {
     for (final player in widget.players) {
       final selectedValue = await showDialog<String>(
         context: context,
@@ -173,13 +169,18 @@ class _PlayerCardState extends State<PlayerCard> {
                       setState(() {});
                     },
                     child: Container(
-                      color: Colors.red,
-                      child: Text(
-                          widget.player.specialModeActive
-                              ? 'Deactivate'
-                              : 'Activate',
-                          style: const TextStyle(
-                              fontSize: 14, fontWeight: FontWeight.bold)),
+                      decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(8),
+                          color: Colors.red),
+                      child: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Text(
+                            widget.player.specialModeActive
+                                ? 'Deactivate'
+                                : 'Activate',
+                            style: const TextStyle(
+                                fontSize: 14, fontWeight: FontWeight.bold)),
+                      ),
                     ),
                   ),
                 ],
