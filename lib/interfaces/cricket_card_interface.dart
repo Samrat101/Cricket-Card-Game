@@ -1,8 +1,10 @@
+import 'package:cricket_card_game/interfaces/card_attribute.dart';
+
 abstract class CricketCardInterface {
-  int get runs;
-  int get matches;
-  int get centuries;
-  int get halfCenturies;
-  int get catches;
-  int get wickets;
+  CardAttribute get runs;
+  CardAttribute get matches;
+  CardAttribute get centuries;
+  CardAttribute get halfCenturies;
+  CardAttribute get catches;
+  CardAttribute get wickets;
 }

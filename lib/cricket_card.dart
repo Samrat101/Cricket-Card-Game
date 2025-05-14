@@ -1,48 +1,36 @@
+import 'package:cricket_card_game/interfaces/card_attribute.dart';
 import 'package:cricket_card_game/interfaces/cricket_card_interface.dart';
 
 class CricketCard implements CricketCardInterface {
-  final int _runs;
-  final int _matches;
-  final int _centuries;
-  final int _halfCenturies;
-  final int _catches;
-  final int _wickets;
-
-  /// Range from 0 to 100,000
+  final CardAttribute _catches;
+  final CardAttribute _centuries;
+  final CardAttribute _halfCenturies;
+  final CardAttribute _matches;
+  final CardAttribute _runs;
+  final CardAttribute _wickets;
   @override
-  int get runs => _runs;
-
-  /// Range from 0 to 500
+  CardAttribute get catches => _catches;
   @override
-  int get matches => _matches;
-
-  /// Range from 0 to 100
+  CardAttribute get centuries => _centuries;
   @override
-  int get centuries => _centuries;
-
-  /// Range from 0 to 80
+  CardAttribute get halfCenturies => _halfCenturies;
   @override
-  int get halfCenturies => _halfCenturies;
-
-  /// Range from 0 to 380
+  CardAttribute get matches => _matches;
   @override
-  int get catches => _catches;
-
-  /// Range from 0 to 960
+  CardAttribute get runs => _runs;
   @override
-  int get wickets => _wickets;
-
+  CardAttribute get wickets => _wickets;
   CricketCard({
-    required int runs,
-    required int matches,
-    required int centuries,
-    required int halfCenturies,
-    required int catches,
-    required int wickets,
-  })  : _runs = runs,
-        _matches = matches,
+    required CardAttribute catches,
+    required CardAttribute centuries,
+    required CardAttribute halfCenturies,
+    required CardAttribute matches,
+    required CardAttribute runs,
+    required CardAttribute wickets,
+  })  : _catches = catches,
         _centuries = centuries,
         _halfCenturies = halfCenturies,
-        _catches = catches,
+        _matches = matches,
+        _runs = runs,
         _wickets = wickets;
 }
