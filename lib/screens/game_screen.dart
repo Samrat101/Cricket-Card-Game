@@ -2,7 +2,6 @@ import 'package:cricket_card_game/player/player.dart';
 import 'package:cricket_card_game/screens/cards_screen.dart';
 import 'package:cricket_card_game/screens/mode_selection.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 
 enum SpecialMode {
   powerPlayMode('Power Play Mode'),
@@ -43,7 +42,7 @@ class _GameScreenState extends State<GameScreen> {
             ),
           ),
           child: Stack(children: [
-            CardGameScreen(onGameStart: startGame),
+            CardGameScreen(onGameStart: startGame, players: widget.players),
             Column(
               children: [
                 Row(

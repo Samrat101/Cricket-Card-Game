@@ -1,3 +1,4 @@
+import 'package:cricket_card_game/cricket_card.dart';
 import 'package:cricket_card_game/player/player.dart';
 
 class Game {

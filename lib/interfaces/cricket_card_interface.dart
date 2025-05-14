@@ -7,4 +7,6 @@ abstract class CricketCardInterface {
   CardAttribute get halfCenturies;
   CardAttribute get catches;
   CardAttribute get wickets;
+  String get playerName;
+  bool get isSelected;
 }
