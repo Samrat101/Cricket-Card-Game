@@ -1,28 +1,65 @@
 import 'dart:async';
+import 'package:cricket_card_game/cricket_card.dart';
+import 'package:cricket_card_game/interfaces/cricket_card_interface.dart';
+import 'package:cricket_card_game/player/player.dart';
 import 'package:cricket_card_game/screens/filp_card.dart';
+import 'package:cricket_card_game/seed_data/seed_data.dart';
 import 'package:flutter/material.dart';
 
 class CardGameScreen extends StatefulWidget {
   final Function onGameStart;
-  const CardGameScreen({super.key, required this.onGameStart});
+  final List<Player> players;
+  const CardGameScreen(
+      {super.key, required this.onGameStart, required this.players});
 
   @override
   State<CardGameScreen> createState() => _CardGameScreenState();
 }
 
 class _CardGameScreenState extends State<CardGameScreen> {
+  List<CricketCardInterface> cards = [];
   final int totalCards = 20;
   final double cardWidth = 130;
   final double cardHeight = 160;
   final double spacingX = 12;
   final double spacingY = 16;
   bool _playTapped = false;
-
   late Offset centerOffset;
   late List<Offset> cardPositions;
   late List<GlobalKey<FlipCardState>> cardKeys;
 
   bool hasDistributed = false;
+  @override
+  void initState() {
+    super.initState();
+    startCardDistributionForPlayers();
+  }
+
+  void startCardDistributionForPlayers() {
+    // Create and shuffle the cards
+    final allCards = List<CricketCard>.from(
+      SeedData.cardAttributes.map((e) => CricketCard.fromJson(e)),
+    )..shuffle();
+
+    // Calculate cards per player
+    final players = widget.players;
+    final cardsPerPlayer = allCards.length ~/ players.length;
+
+    // Distribute cards to each player
+    for (var i = 0; i < players.length; i++) {
+      final start = i * cardsPerPlayer;
+      final end = (i == players.length - 1)
+          ? allCards.length
+          : (i + 1) * cardsPerPlayer;
+      final playerCards = allCards.sublist(start, end);
+      players[i].dealCard(playerCards);
+    }
+
+    // Update the local cards list with all cards for UI purposes
+    setState(() {
+      cards = allCards;
+    });
+  }
 
   @override
   void didChangeDependencies() {

@@ -42,7 +42,7 @@ class _GameScreenState extends State<GameScreen> {
             ),
           ),
           child: Stack(children: [
-            CardGameScreen(onGameStart: startGame),
+            CardGameScreen(onGameStart: startGame, players: widget.players),
             Column(
               children: [
                 Row(

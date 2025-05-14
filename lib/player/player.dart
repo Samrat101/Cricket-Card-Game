@@ -1,3 +1,4 @@
+import 'package:cricket_card_game/cricket_card.dart';
 import 'package:cricket_card_game/screens/game_screen.dart';
 
 abstract class Player {
@@ -52,9 +53,3 @@ abstract class Player {
 
   CricketCard playCard();
 }
-
-class CricketCard {
-  bool isSelected = false;
-}
-
-class Mode {}
