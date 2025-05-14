@@ -3,7 +3,8 @@ import 'package:cricket_card_game/screens/filp_card.dart';
 import 'package:flutter/material.dart';
 
 class CardGameScreen extends StatefulWidget {
-  const CardGameScreen({super.key});
+  final Function onGameStart;
+  const CardGameScreen({super.key, required this.onGameStart});
 
   @override
   State<CardGameScreen> createState() => _CardGameScreenState();
@@ -92,6 +93,9 @@ class _CardGameScreenState extends State<CardGameScreen> {
     }
     setState(() {
       _playTapped = true;
+    });
+    Future.delayed(const Duration(seconds: 4), () {
+      widget.onGameStart();
     });
   }
 

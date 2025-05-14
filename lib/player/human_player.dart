@@ -4,7 +4,7 @@ class HumanPlayer extends Player {
   HumanPlayer(super.name);
 
   @override 
-  Card playCard() {
-    return cards.removeAt(0);
+  CricketCard playCard() {
+    return cards.firstWhere((card) => card.isSelected == true); 
   } 
 } 

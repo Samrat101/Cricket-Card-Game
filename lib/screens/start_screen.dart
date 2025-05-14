@@ -1,3 +1,5 @@
+import 'package:cricket_card_game/player/human_player.dart';
+import 'package:cricket_card_game/player/player.dart';
 import 'package:cricket_card_game/screens/game_screen.dart';
 import 'package:flutter/material.dart';
 
@@ -9,6 +11,7 @@ class GameStartScreen extends StatefulWidget {
 class _GameStartScreenState extends State<GameStartScreen> {
   int? _numPlayers;
   List<String> _playerNames = [];
+  List<Player> _players = [];
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -90,6 +93,7 @@ class _GameStartScreenState extends State<GameStartScreen> {
             onPressed: () {
               if (controller.text.trim().isEmpty) return;
               setState(() {
+                _players.add(HumanPlayer(controller.text.trim())); 
                 _playerNames[playerIndex - 1] = controller.text.trim();
               });
               Navigator.of(context).pop();
@@ -99,7 +103,7 @@ class _GameStartScreenState extends State<GameStartScreen> {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                      builder: (context) => GameScreen(names: _playerNames)),
+                      builder: (context) => GameScreen(players: _players)),
                 );
               }
             },

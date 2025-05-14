@@ -16,4 +16,3 @@ class CricketCardGameApp extends StatelessWidget {
     );
   }
 }
-

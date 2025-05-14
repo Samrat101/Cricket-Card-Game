@@ -1,22 +1,44 @@
+import 'package:cricket_card_game/screens/game_screen.dart';
+
 abstract class Player {
   final String name;
+  bool _myTurn = false;
   double _health = 100;
-  List<Card> _cards = []; 
-  Mode? _specialMode; 
+  List<CricketCard> _cards = [];
+  SpecialMode? _specialMode;
+  bool specialModeActive = false;
 
   Player(this.name);
   double get health => _health;
-  List<Card> get cards => _cards;
-
-  void dealCard(List<Card> cards) {
+  bool get myTurn => _myTurn;
+  List<CricketCard> get cards => _cards;
+  SpecialMode? get specialMode => _specialMode;
+  bool get isSpecialModeActive => specialModeActive;
+  void dealCard(List<CricketCard> cards) {
     _cards = cards;
   }
 
-  void updateSpecialMode(Mode mode) {
+  void updateSpecialMode(SpecialMode mode) {
     _specialMode = mode;
   }
 
-  set updateHealth(double value) {
+  void activateSpecialMode() {
+    if (_specialMode != null) {
+      specialModeActive = true;
+    }
+  }
+
+  void deActivateSpecialMode() {
+    if (_specialMode != null) {
+      specialModeActive = false;
+    }
+  }
+
+  void setMyTurn(bool value) {
+    _myTurn = value;
+  }
+
+  void updateHealth(double value) {
     _health = _health + value;
     if (_health < 0) {
       _health = 0;
@@ -26,14 +48,12 @@ abstract class Player {
       _health = value;
     }
   }
-  Card playCard();
+
+  CricketCard playCard();
 }
 
-
-class Card {
-
+class CricketCard {
+  bool isSelected = false;
 }
 
-class Mode {
-
-}
+class Mode {}

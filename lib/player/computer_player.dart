@@ -6,7 +6,7 @@ class ComputerPlayer extends Player {
 ComputerPlayer(super.name, this._strategy);
 
 @override 
-Card playCard() {
+CricketCard playCard() {
   final selectedCard = _strategy.playCard(cards);  
   return selectedCard;
 } 

@@ -1,9 +1,31 @@
+import 'package:cricket_card_game/player/player.dart';
 import 'package:cricket_card_game/screens/cards_screen.dart';
+import 'package:cricket_card_game/screens/mode_selection.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
+
+enum SpecialMode {
+  powerPlayMode('Power Play Mode'),
+  superMode('Super Mode'),
+  freeHitMode('Free Hit Mode');
+
+  final String displayName;
+
+  const SpecialMode(this.displayName);
+}
+
+SpecialMode? getSpecialModeFromString(String input) {
+  for (var mode in SpecialMode.values) {
+    if (mode.displayName.toLowerCase() == input.toLowerCase()) {
+      return mode;
+    }
+  }
+  return null; // or throw an error if you prefer
+}
 
 class GameScreen extends StatefulWidget {
-  final List<String> names;
-  const GameScreen({super.key, required this.names});
+  final List<Player> players;
+  const GameScreen({super.key, required this.players});
 
   @override
   State<GameScreen> createState() => _GameScreenState();
@@ -21,22 +43,90 @@ class _GameScreenState extends State<GameScreen> {
             ),
           ),
           child: Stack(children: [
-            const CardGameScreen(),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: widget.names
-                  .map((name) => PlayerCard(playerName: name))
-                  .toList(),
+            CardGameScreen(onGameStart: startGame),
+            Column(
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: widget.players
+                      .map((player) => PlayerCard(player: player))
+                      .toList(),
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        minimumSize: const Size(250, 60),
+                        backgroundColor: Colors.white, // or any other color
+                      ),
+                      onPressed: () {},
+                      child: const Text(
+                        'Start Game',
+                        style: TextStyle(
+                          fontSize: 32,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.black,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
             ),
           ])),
     );
-    ;
+  }
+
+  void startGame() {
+    print('Starting game...');
+    // Here you can implement the logic to start the game
+    // Game game  = Game(widget.players);
+    // game.start();
+    _showModeDialog();
+  }
+
+  void _showModeDialog() async {
+    for (final player in widget.players) {
+      final selectedValue = await showDialog<String>(
+        context: context,
+        barrierDismissible: false,
+        builder: (context) => ModeDialog(player: player),
+      );
+      if (selectedValue != null) {
+        SpecialMode mode = getSpecialModeFromString(selectedValue)!;
+        player.updateSpecialMode(mode);
+        setState(() {});
+      }
+    }
+  }
+
+  Widget _playerCountTile(int count) {
+    return InkWell(
+      onTap: () {
+        Navigator.of(context).pop();
+      },
+      child: Container(
+        width: double.infinity,
+        padding: const EdgeInsets.symmetric(vertical: 16),
+        decoration: BoxDecoration(
+          border: Border.all(color: Colors.black, width: 2),
+          borderRadius: BorderRadius.circular(8),
+        ),
+        child: Center(
+          child: Text(
+            '$count Players',
+            style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+          ),
+        ),
+      ),
+    );
   }
 }
 
 class PlayerCard extends StatefulWidget {
-  final String playerName;
-  const PlayerCard({super.key, required this.playerName});
+  final Player player;
+  const PlayerCard({super.key, required this.player});
 
   @override
   State<PlayerCard> createState() => _PlayerCardState();
@@ -63,9 +153,37 @@ class _PlayerCardState extends State<PlayerCard> {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(widget.playerName,
+            Text(widget.player.name,
                 style:
                     const TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+            if (widget.player.specialMode != null)
+              Row(
+                children: [
+                  Text(widget.player.specialMode!.displayName,
+                      style: const TextStyle(
+                          fontSize: 20, fontWeight: FontWeight.bold)),
+                  const SizedBox(width: 12),
+                  GestureDetector(
+                    onTap: () {
+                      if (widget.player.specialModeActive) {
+                        widget.player.deActivateSpecialMode();
+                      } else {
+                        widget.player.activateSpecialMode();
+                      }
+                      setState(() {});
+                    },
+                    child: Container(
+                      color: Colors.red,
+                      child: Text(
+                          widget.player.specialModeActive
+                              ? 'Deactivate'
+                              : 'Activate',
+                          style: const TextStyle(
+                              fontSize: 14, fontWeight: FontWeight.bold)),
+                    ),
+                  ),
+                ],
+              ),
             const SizedBox(height: 12),
             ClipRRect(
               borderRadius: BorderRadius.circular(8),
