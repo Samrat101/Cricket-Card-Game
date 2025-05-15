@@ -12,6 +12,8 @@ class CricketCard implements CricketCardInterface {
   @override
   bool isSelected = false;
   @override
+  bool canSelect = false;
+  @override
   CardAttribute get catches => _catches;
   @override
   CardAttribute get centuries => _centuries;
@@ -25,6 +27,11 @@ class CricketCard implements CricketCardInterface {
   CardAttribute get wickets => _wickets;
   @override
   String get playerName => _playerName;
+
+  @override
+  void updateCardStatus(bool status) {
+    isSelected = status;
+  }
   CricketCard({
     required String playerName,
     required CardAttribute catches,
