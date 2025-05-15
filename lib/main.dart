@@ -1,5 +1,3 @@
-import 'dart:math';
-
 import 'package:cricket_card_game/screens/start_screen.dart';
 import 'package:flutter/material.dart';
 

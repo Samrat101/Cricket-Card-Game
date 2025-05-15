@@ -13,6 +13,8 @@ class CricketCard implements CricketCardInterface {
   bool isSelected = false;
   @override
   bool canSelect = false;
+   @override
+  bool isDiscarded= false;
   @override
   CardAttribute get catches => _catches;
   @override

@@ -71,7 +71,7 @@ class FlipCardState extends State<FlipCard>
         final displayText = isHalfWay ? widget.backText : widget.frontText;
         return GestureDetector(
           onTap: () {
-            if (widget.card.canSelect) {
+            if (widget.card.canSelect && !widget.card.isDiscarded) {
               widget.card.updateCardStatus(!widget.card.isSelected);
               widget.cardSeletedCallback(widget.card);
             }
@@ -86,6 +86,12 @@ class FlipCardState extends State<FlipCard>
               width: widget.width,
               height: widget.height,
               decoration: BoxDecoration(
+                image: widget.card.isDiscarded
+                    ? const DecorationImage(
+                        image: AssetImage('assets/images/cross.png'),
+                        fit: BoxFit.cover,
+                      )
+                    : null,
                 color: widget.card.isSelected
                     ? Colors.green
                     : widget.card.canSelect

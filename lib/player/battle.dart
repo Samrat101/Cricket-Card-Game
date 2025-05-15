@@ -22,9 +22,17 @@ class Game {
     currentLeaderIndex = (currentLeaderIndex + 1) % players.length;
     currentLeader.setAsLeader();
     for (var element in opponent.cards) {
+      if (element.isSelected) {
+        element.isSelected = false;
+        element.isDiscarded = true;
+      }
       element.canSelect = false;
     }
     for (var element in currentLeader.cards) {
+      if (element.isSelected) {
+        element.isSelected = false;
+        element.isDiscarded = true;
+      }
       element.canSelect = true;
     }
   }
