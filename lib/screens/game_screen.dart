@@ -1,26 +1,11 @@
+import 'package:cricket_card_game/enums.dart';
+import 'package:cricket_card_game/interfaces/cricket_card_interface.dart';
+import 'package:cricket_card_game/player/battle.dart';
 import 'package:cricket_card_game/player/player.dart';
 import 'package:cricket_card_game/screens/cards_screen.dart';
 import 'package:cricket_card_game/screens/mode_selection.dart';
+import 'package:cricket_card_game/screens/player_card.dart';
 import 'package:flutter/material.dart';
-
-enum SpecialMode {
-  powerPlayMode('Power Play Mode'),
-  superMode('Super Mode'),
-  freeHitMode('Free Hit Mode');
-
-  final String displayName;
-
-  const SpecialMode(this.displayName);
-}
-
-SpecialMode? getSpecialModeFromString(String input) {
-  for (var mode in SpecialMode.values) {
-    if (mode.displayName.toLowerCase() == input.toLowerCase()) {
-      return mode;
-    }
-  }
-  return null; // or throw an error if you prefer
-}
 
 class GameScreen extends StatefulWidget {
   final List<Player> players;
@@ -31,6 +16,9 @@ class GameScreen extends StatefulWidget {
 }
 
 class _GameScreenState extends State<GameScreen> {
+  late Game game;
+  bool canStartGame = false;
+  bool gameStarted = false;
   @override
   Widget build(BuildContext context) {
     return Material(
@@ -42,7 +30,10 @@ class _GameScreenState extends State<GameScreen> {
             ),
           ),
           child: Stack(children: [
-            CardGameScreen(onGameStart: startGame, players: widget.players),
+            CardGameScreen(
+                onGameStart: showModeSelectionDilog,
+                players: widget.players,
+                cardSeletedCallback: cardSeletedCallback),
             Column(
               children: [
                 Row(
@@ -51,26 +42,51 @@ class _GameScreenState extends State<GameScreen> {
                       .map((player) => PlayerCard(player: player))
                       .toList(),
                 ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        minimumSize: const Size(250, 60),
-                        backgroundColor: Colors.white, // or any other color
-                      ),
-                      onPressed: () {},
-                      child: const Text(
-                        'Start Game',
-                        style: TextStyle(
-                          fontSize: 32,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.black,
+                if (canStartGame && !gameStarted)
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          minimumSize: const Size(250, 60),
+                          backgroundColor: Colors.white, // or any other color
+                        ),
+                        onPressed: () {
+                          startGame();
+                        },
+                        child: const Text(
+                          'Start Game',
+                          style: TextStyle(
+                            fontSize: 32,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.black,
+                          ),
                         ),
                       ),
-                    ),
-                  ],
-                ),
+                    ],
+                  ),
+                if (gameStarted)
+                  Container(
+                    width: 300.0,
+                    height: 500.0,
+                    color: Colors.white,
+                    child: game.isLeaderCardSelected() &&
+                            game.selectedAttribute == null
+                        ? buildAttributeSelector()
+                        : Center(
+                            child: Text(
+                              game.selectedAttribute != null
+                                  ? '${game.opponent.name} Please Select A Card'
+                                  : '${game.currentLeader.name} Please Select A Card',
+                              textAlign: TextAlign.center,
+                              style: const TextStyle(
+                                fontSize: 32,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.black,
+                              ),
+                            ),
+                          ),
+                  )
               ],
             ),
           ])),
@@ -78,14 +94,36 @@ class _GameScreenState extends State<GameScreen> {
   }
 
   void startGame() {
-    print('Starting game...');
-    // Here you can implement the logic to start the game
-    // Game game  = Game(widget.players);
-    // game.start();
-    _showModeDialog();
+    game = Game(widget.players);
+    game.start();
+    gameStarted = true;
+    setState(() {});
   }
 
-  void _showModeDialog() async {
+  void cardSeletedCallback(CricketCardInterface card) {
+    if (game.allCardsSelected()) {
+      game.compareCards();
+      game.nextTurn(); // need to fix this.
+      setState(() {});
+      return;
+    }
+    Player player =
+        game.selectedAttribute != null ? game.opponent : game.currentLeader;
+    for (var element in player.cards) {
+      if (element != card) {
+        element.updateCardStatus(false);
+      }
+    }
+    setState(() {});
+  }
+
+  void showModeSelectionDilog() async {
+    await _showModeDialog();
+    canStartGame = true;
+    setState(() {});
+  }
+
+  _showModeDialog() async {
     for (final player in widget.players) {
       final selectedValue = await showDialog<String>(
         context: context,
@@ -100,102 +138,41 @@ class _GameScreenState extends State<GameScreen> {
     }
   }
 
-  Widget _playerCountTile(int count) {
-    return InkWell(
-      onTap: () {
-        Navigator.of(context).pop();
-      },
-      child: Container(
-        width: double.infinity,
-        padding: const EdgeInsets.symmetric(vertical: 16),
-        decoration: BoxDecoration(
-          border: Border.all(color: Colors.black, width: 2),
-          borderRadius: BorderRadius.circular(8),
-        ),
-        child: Center(
-          child: Text(
-            '$count Players',
-            style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class PlayerCard extends StatefulWidget {
-  final Player player;
-  const PlayerCard({super.key, required this.player});
-
-  @override
-  State<PlayerCard> createState() => _PlayerCardState();
-}
-
-class _PlayerCardState extends State<PlayerCard> {
-  double _health = 1.0; // 100%
-
-  void _changeHealth(double delta) {
-    setState(() {
-      _health = (_health + delta).clamp(0.0, 1.0);
-    });
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Card(
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      elevation: 4,
-      child: Container(
-        width: 350,
-        padding: const EdgeInsets.all(12),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(widget.player.name,
-                style:
-                    const TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
-            if (widget.player.specialMode != null)
-              Row(
-                children: [
-                  Text(widget.player.specialMode!.displayName,
-                      style: const TextStyle(
-                          fontSize: 20, fontWeight: FontWeight.bold)),
-                  const SizedBox(width: 12),
-                  GestureDetector(
-                    onTap: () {
-                      if (widget.player.specialModeActive) {
-                        widget.player.deActivateSpecialMode();
-                      } else {
-                        widget.player.activateSpecialMode();
-                      }
-                      setState(() {});
-                    },
-                    child: Container(
-                      color: Colors.red,
-                      child: Text(
-                          widget.player.specialModeActive
-                              ? 'Deactivate'
-                              : 'Activate',
-                          style: const TextStyle(
-                              fontSize: 14, fontWeight: FontWeight.bold)),
-                    ),
-                  ),
-                ],
+  Widget buildAttributeSelector() {
+    List<String> attributes = [
+      'runs',
+      'wickets',
+      'average',
+      'strikeRate',
+      'economyRate',
+    ];
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        Text(
+            '${game.players[game.currentLeaderIndex].name} Please select attribute to compare',
+            textAlign: TextAlign.center,
+            style: const TextStyle(
+              fontSize: 32,
+              fontWeight: FontWeight.bold,
+              color: Colors.black,
+            )),
+        ...attributes.map((attribute) => Padding(
+              padding: const EdgeInsets.all(12.0),
+              child: ElevatedButton(
+                onPressed: () {
+                  game.attributeSelected(attribute);
+                  setState(() {});
+                },
+                child: Text(attribute,
+                    style: const TextStyle(
+                      fontSize: 22,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black,
+                    )),
               ),
-            const SizedBox(height: 12),
-            ClipRRect(
-              borderRadius: BorderRadius.circular(8),
-              child: LinearProgressIndicator(
-                value: _health,
-                minHeight: 12,
-                backgroundColor: Colors.grey[300],
-                valueColor: const AlwaysStoppedAnimation<Color>(Colors.green),
-              ),
-            ),
-          ],
-        ),
-      ),
+            )),
+      ],
     );
   }
 }

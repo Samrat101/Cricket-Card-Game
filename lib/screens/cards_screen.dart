@@ -9,8 +9,12 @@ import 'package:flutter/material.dart';
 class CardGameScreen extends StatefulWidget {
   final Function onGameStart;
   final List<Player> players;
+  final Function(CricketCardInterface) cardSeletedCallback;
   const CardGameScreen(
-      {super.key, required this.onGameStart, required this.players});
+      {super.key,
+      required this.onGameStart,
+      required this.players,
+      required this.cardSeletedCallback});
 
   @override
   State<CardGameScreen> createState() => _CardGameScreenState();
@@ -18,7 +22,6 @@ class CardGameScreen extends StatefulWidget {
 
 class _CardGameScreenState extends State<CardGameScreen> {
   List<CricketCardInterface> cards = [];
-  final int totalCards = 20;
   final double cardWidth = 130;
   final double cardHeight = 160;
   final double spacingX = 12;
@@ -43,18 +46,19 @@ class _CardGameScreenState extends State<CardGameScreen> {
 
     // Calculate cards per player
     final players = widget.players;
-    final cardsPerPlayer = allCards.length ~/ players.length;
 
     // Distribute cards to each player
     for (var i = 0; i < players.length; i++) {
-      final start = i * cardsPerPlayer;
-      final end = (i == players.length - 1)
-          ? allCards.length
-          : (i + 1) * cardsPerPlayer;
-      final playerCards = allCards.sublist(start, end);
+      List<CricketCard> playerCards = [];
+      for (var j = 0; j < allCards.length; j++) {
+        if (j % players.length == i) {
+          allCards[j].canSelect = players[i].currentLeader;
+          playerCards.add(allCards[j]);
+        }
+      }
       players[i].dealCard(playerCards);
     }
-
+    players.first.cards.map((e) => e.playerName).toList();
     // Update the local cards list with all cards for UI purposes
     setState(() {
       cards = allCards;
@@ -71,8 +75,8 @@ class _CardGameScreenState extends State<CardGameScreen> {
       screenSize.height / 2 - cardHeight / 2,
     );
 
-    cardPositions = List.generate(totalCards, (_) => centerOffset);
-    cardKeys = List.generate(totalCards, (_) => GlobalKey<FlipCardState>());
+    cardPositions = List.generate(cards.length, (_) => centerOffset);
+    cardKeys = List.generate(cards.length, (_) => GlobalKey<FlipCardState>());
   }
 
   void startDistribution() {
@@ -84,7 +88,7 @@ class _CardGameScreenState extends State<CardGameScreen> {
     final rightStartX = screenSize.width - (4 * cardWidth + 3 * spacingX) - 20;
     final startY = screenSize.height / 2 - 1.5 * cardHeight;
 
-    for (int i = 0; i < totalCards; i++) {
+    for (int i = 0; i < cards.length; i++) {
       final isPlayer1 = i % 2 == 0;
       final cardIndex = i ~/ 2;
 
@@ -118,7 +122,7 @@ class _CardGameScreenState extends State<CardGameScreen> {
           cardPositions[i] = target;
         });
 
-        if (i == totalCards - 1) {
+        if (i == cards.length - 1) {
           // All cards distributed, flip all after short delay
           Future.delayed(const Duration(seconds: 1), () {
             for (var key in cardKeys) {
@@ -139,7 +143,7 @@ class _CardGameScreenState extends State<CardGameScreen> {
   void startFlipAnimation() async {
     // Define anti-clockwise order (player 2 -> player 1 reverse)
     List<int> flipOrder = [];
-    for (int i = totalCards - 1; i >= 0; i--) {
+    for (int i = cards.length - 1; i >= 0; i--) {
       flipOrder.add(i);
     }
 
@@ -154,7 +158,7 @@ class _CardGameScreenState extends State<CardGameScreen> {
     return Stack(
       children: [
         // Cards
-        ...List.generate(totalCards, (index) {
+        ...List.generate(cards.length, (index) {
           return AnimatedPositioned(
             duration: const Duration(milliseconds: 300),
             curve: Curves.easeInOut,
@@ -162,10 +166,12 @@ class _CardGameScreenState extends State<CardGameScreen> {
             top: cardPositions[index].dy,
             child: FlipCard(
               key: cardKeys[index],
+              card: cards[index],
               width: cardWidth,
               height: cardHeight,
               frontText: 'Card ${index + 1}',
               backText: '🂠',
+              cardSeletedCallback: widget.cardSeletedCallback,
             ),
           );
         }),
@@ -182,7 +188,8 @@ class _CardGameScreenState extends State<CardGameScreen> {
                 ),
                 child: const Center(
                   child: Text(
-                    'Start Game',
+                    'Distribute Cards',
+                    textAlign: TextAlign.center,
                     style: TextStyle(color: Colors.white, fontSize: 18),
                   ),
                 ),

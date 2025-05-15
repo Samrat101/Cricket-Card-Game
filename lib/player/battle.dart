@@ -1,38 +1,80 @@
-import 'package:cricket_card_game/cricket_card.dart';
+import 'package:cricket_card_game/interfaces/card_attribute.dart';
 import 'package:cricket_card_game/player/player.dart';
 
 class Game {
   final List<Player> players;
-  int currentPlayerIndex = 0;
-  int turnNumber = 1;
-
+  int currentLeaderIndex = 0;
+  CardAttribute? selectedAttribute;
   Game(this.players);
+  Player get currentLeader => players[currentLeaderIndex];
+  Player get opponent => players[(currentLeaderIndex + 1) % players.length];
 
   void start() {
-    Player activePlayer = players.first;
-    activePlayer.setMyTurn(true);
-    while (players.firstWhere((player) => player.health != 0) == null) {
-     CricketCard activePlayerCard = activePlayer.playCard();
+    players[currentLeaderIndex].setAsLeader();
+    for (var element in players[currentLeaderIndex].cards) {
+      element.canSelect = true;
     }
   }
 
-  void startNextTurn() {
-    print('--- Turn $turnNumber ---');
-    currentPlayerIndex = 0;
-    _takeNextPlayerTurn();
+  void nextTurn() {
+    selectedAttribute = null;
+    currentLeader.deSetAsLeader();
+    currentLeaderIndex = (currentLeaderIndex + 1) % players.length;
+    currentLeader.setAsLeader();
+    for (var element in opponent.cards) {
+      element.canSelect = false;
+    }
+    for (var element in currentLeader.cards) {
+      element.canSelect = true;
+    }
   }
 
-  void _takeNextPlayerTurn() {
-    if (currentPlayerIndex < players.length) {
-      final player = players[currentPlayerIndex];
-      player.playCard();
+  bool isLeaderCardSelected() {
+    for (var card in players[currentLeaderIndex].cards) {
+      if (card.isSelected) {
+        return true;
+      }
+    }
+    return false;
+  }
 
-      // Proceed to the next player's turn
-      currentPlayerIndex++;
-      _takeNextPlayerTurn(); // You can delay this if you're in UI
-    } else {
-      print('Turn $turnNumber complete');
-      turnNumber++;
+  bool allCardsSelected() {
+    for (var player in players) {
+      if (player.cards.any((card) => card.isSelected)) {
+        continue;
+      } else {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  void compareCards() {
+    currentLeader.updateHealth(-10);
+  }
+
+  void attributeSelected(String attribute) {
+    for (var element in currentLeader.cards) {
+      element.canSelect = false;
+    }
+    for (var element in opponent.cards) {
+      element.canSelect = true;
+    }
+    switch (attribute.toLowerCase()) {
+      case 'catches':
+        selectedAttribute = players[currentLeaderIndex].cards[0].catches;
+      case 'centuries':
+        selectedAttribute = players[currentLeaderIndex].cards[0].centuries;
+      case 'halfCenturies':
+        selectedAttribute = players[currentLeaderIndex].cards[0].halfCenturies;
+      case 'matches':
+        selectedAttribute = players[currentLeaderIndex].cards[0].matches;
+      case 'runs':
+        selectedAttribute = players[currentLeaderIndex].cards[0].runs;
+      case 'wickets':
+        selectedAttribute = players[currentLeaderIndex].cards[0].wickets;
+      default:
+        throw Exception('Invalid attribute');
     }
   }
 }
