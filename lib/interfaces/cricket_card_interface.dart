@@ -10,5 +10,6 @@ abstract class CricketCardInterface {
   String get playerName;
   bool get isSelected;
   bool get canSelect;
+   bool get isDiscarded;
   void updateCardStatus(bool status);
 }
