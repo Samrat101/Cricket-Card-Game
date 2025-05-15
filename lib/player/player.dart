@@ -1,10 +1,12 @@
 import 'package:cricket_card_game/cricket_card.dart';
 import 'package:cricket_card_game/enums.dart';
+import 'package:cricket_card_game/interfaces/card_attribute.dart';
 import 'package:cricket_card_game/interfaces/cricket_card_interface.dart';
 
 abstract class Player {
   final String name;
   bool _currentLeader = false;
+  bool _isTurnPlayer = false;
   double _health = 100;
   List<CricketCard> _cards = [];
   SpecialMode? _specialMode;
@@ -13,10 +15,12 @@ abstract class Player {
   Player(this.name);
   double get health => _health;
   bool get isCurrentLeader => _currentLeader;
+  bool get isTurnPlayer => _isTurnPlayer;
   List<CricketCard> get cards => _cards;
   SpecialMode? get specialMode => _specialMode;
   bool get isSpecialModeActive => specialModeActive;
   CricketCardInterface? currentCard;
+  CardAttribute? selectedAttribute;
   void dealCard(List<CricketCard> cards) {
     _cards = cards;
   }
@@ -51,6 +55,14 @@ abstract class Player {
 
   void deSetAsLeader() {
     _currentLeader = false;
+  }
+
+  void setAsTurnPlayer() {
+    _isTurnPlayer = true;
+  }
+
+  void deSetAsTurnPlayer() {
+    _isTurnPlayer = false;
   }
 
   void updateHealth(double value) {

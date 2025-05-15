@@ -1,3 +1,4 @@
+import 'package:cricket_card_game/enums.dart';
 import 'package:cricket_card_game/interfaces/card_attribute.dart';
 import 'package:cricket_card_game/interfaces/cricket_card_interface.dart';
 
@@ -13,8 +14,8 @@ class CricketCard implements CricketCardInterface {
   bool isSelected = false;
   @override
   bool canSelect = false;
-   @override
-  bool isDiscarded= false;
+  @override
+  bool isDiscarded = false;
   @override
   CardAttribute get catches => _catches;
   @override
@@ -34,6 +35,7 @@ class CricketCard implements CricketCardInterface {
   void updateCardStatus(bool status) {
     isSelected = status;
   }
+
   CricketCard({
     required String playerName,
     required CardAttribute catches,
@@ -60,5 +62,29 @@ class CricketCard implements CricketCardInterface {
       runs: CardAttribute.fromJson(json['runs']),
       wickets: CardAttribute.fromJson(json['wickets']),
     );
+  }
+
+  @override
+  CardAttribute getAttribute({required String withValue}) {
+    final cardAttributeType = CardAttributeType.from(withValue);
+    if (cardAttributeType == null) {
+      throw Exception('Invalid attribute type');
+    }
+    switch (cardAttributeType) {
+      case CardAttributeType.catches:
+        return catches;
+      case CardAttributeType.centuries:
+        return centuries;
+      case CardAttributeType.halfCenturies:
+        return halfCenturies;
+      case CardAttributeType.matches:
+        return matches;
+      case CardAttributeType.runs:
+        return runs;
+      case CardAttributeType.wickets:
+        return wickets;
+      default:
+        throw Exception('Invalid attribute');
+    }
   }
 }

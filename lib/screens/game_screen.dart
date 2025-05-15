@@ -22,84 +22,86 @@ class _GameScreenState extends State<GameScreen> {
   @override
   Widget build(BuildContext context) {
     return Material(
-      child: Container(
-          decoration: const BoxDecoration(
-            image: DecorationImage(
-              image: AssetImage('assets/images/game_screen.jpg'),
-              fit: BoxFit.cover,
+      child: Scaffold(
+        body: Container(
+            decoration: const BoxDecoration(
+              image: DecorationImage(
+                image: AssetImage('assets/images/game_screen.jpg'),
+                fit: BoxFit.cover,
+              ),
             ),
-          ),
-          child: Stack(children: [
-            CardGameScreen(
-                onGameStart: showModeSelectionDilog,
-                players: widget.players,
-                cardSeletedCallback: cardSeletedCallback),
-            Column(
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: widget.players
-                      .map((player) => PlayerCard(
-                          player: player,
-                          didChangeSpecialModeState: () {
-                            final canChange =
-                                game.canChangeSpecialMode(player: player);
-                            if (canChange) {
-                              player.toggleSpecialMode();
-                              return true;
-                            }
-                            return false;
-                          }))
-                      .toList(),
-                ),
-                if (canStartGame && !gameStarted)
+            child: Stack(children: [
+              CardGameScreen(
+                  onGameStart: showModeSelectionDilog,
+                  players: widget.players,
+                  cardSeletedCallback: cardSeletedCallback),
+              Column(
+                children: [
                   Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      ElevatedButton(
-                        style: ElevatedButton.styleFrom(
-                          minimumSize: const Size(250, 60),
-                          backgroundColor: Colors.white, // or any other color
-                        ),
-                        onPressed: () {
-                          startGame();
-                        },
-                        child: const Text(
-                          'Start Game',
-                          style: TextStyle(
-                            fontSize: 32,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.black,
-                          ),
-                        ),
-                      ),
-                    ],
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: widget.players
+                        .map((player) => PlayerCard(
+                            player: player,
+                            didChangeSpecialModeState: () {
+                              final canChange =
+                                  game.canChangeSpecialMode(player: player);
+                              if (canChange) {
+                                player.toggleSpecialMode();
+                                return true;
+                              }
+                              return false;
+                            }))
+                        .toList(),
                   ),
-                if (gameStarted)
-                  Container(
-                    width: 300.0,
-                    height: 500.0,
-                    color: Colors.white,
-                    child: game.isLeaderCardSelected() &&
-                            game.selectedAttribute == null
-                        ? buildAttributeSelector()
-                        : Center(
-                            child: Text(
-                              game.selectedAttribute != null
-                                  ? '${game.opponent.name} Please Select A Card'
-                                  : '${game.currentLeader.name} Please Select A Card',
-                              textAlign: TextAlign.center,
-                              style: const TextStyle(
-                                fontSize: 32,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.black,
-                              ),
+                  if (canStartGame && !gameStarted)
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                            minimumSize: const Size(250, 60),
+                            backgroundColor: Colors.white, // or any other color
+                          ),
+                          onPressed: () {
+                            startGame();
+                          },
+                          child: const Text(
+                            'Start Game',
+                            style: TextStyle(
+                              fontSize: 32,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.black,
                             ),
                           ),
-                  )
-              ],
-            ),
-          ])),
+                        ),
+                      ],
+                    ),
+                  if (gameStarted)
+                    Container(
+                      width: 300.0,
+                      height: 500.0,
+                      color: Colors.white,
+                      child: game.isLeaderCardSelected() &&
+                              game.selectedAttribute == null
+                          ? buildAttributeSelector()
+                          : Center(
+                              child: Text(
+                                game.selectedAttribute != null
+                                    ? '${game.opponent.name} Please Select A Card'
+                                    : '${game.currentLeader.name} Please Select A Card',
+                                textAlign: TextAlign.center,
+                                style: const TextStyle(
+                                  fontSize: 32,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.black,
+                                ),
+                              ),
+                            ),
+                    )
+                ],
+              ),
+            ])),
+      ),
     );
   }
 
@@ -111,17 +113,17 @@ class _GameScreenState extends State<GameScreen> {
   }
 
   void cardSeletedCallback(CricketCardInterface card) {
-    game.setCurrentLeaderCard(card);
+    game.currentTurnPlayer.currentCard = card;
     if (game.allCardsSelected()) {
       game.compareCards();
       game.resetCurrentCardsForPlayers();
-      game.nextTurn(); // need to fix this.
+      game.nextTurn();
       setState(() {});
       return;
     }
+    game.moveTurnToNextPlayer();
     Player player =
         game.selectedAttribute != null ? game.opponent : game.currentLeader;
-    game.setCurrentLeaderCard(card);
     for (var element in player.cards) {
       if (element != card) {
         element.updateCardStatus(false);

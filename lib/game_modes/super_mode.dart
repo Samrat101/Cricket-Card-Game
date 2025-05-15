@@ -4,7 +4,8 @@ import 'package:cricket_card_game/interfaces/game_mode.dart';
 import 'package:cricket_card_game/interfaces/result.dart';
 
 class SuperMode implements Mode {
-  final damage = 25;
+  final double winDamage = GameModeType.superr.winDamage;
+  final double lossDamage = GameModeType.superr.lossDamage;
   List<CricketCardInterface> player1Cards, player2Cards;
   SuperMode(this.player1Cards, this.player2Cards);
 
@@ -53,12 +54,12 @@ class SuperMode implements Mode {
       if (didPlayer1Win) {
         return Result(
           activePlayerDamage: 0,
-          opponentPlayerDamage: damage,
+          opponentPlayerDamage: winDamage,
           result: ComparisonOutcome.win,
         );
       } else if (didPlayer2Win) {
         return Result(
-          activePlayerDamage: damage,
+          activePlayerDamage: lossDamage,
           opponentPlayerDamage: 0,
           result: ComparisonOutcome.loss,
         );

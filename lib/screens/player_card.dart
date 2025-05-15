@@ -41,14 +41,24 @@ class _PlayerCardState extends State<PlayerCard> {
                       final canChange = widget.didChangeSpecialModeState();
                       if (canChange) {
                         setState(() {});
+                      } else {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            backgroundColor: Colors.white70,
+                            content: Text(
+                                'You cannot change mode now, wait until you are the leader',
+                                style: TextStyle(
+                                    color: Colors.black,
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.bold)),
+                          ),
+                        );
                       }
                     },
                     child: Container(
                       decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(8),
-                          color: widget.player.isCurrentLeader
-                              ? Colors.red
-                              : Colors.grey),
+                          color: Colors.red),
                       child: Padding(
                         padding: const EdgeInsets.all(8.0),
                         child: Text(

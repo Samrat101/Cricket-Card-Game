@@ -5,7 +5,8 @@ import 'package:cricket_card_game/interfaces/game_mode.dart';
 import 'package:cricket_card_game/interfaces/result.dart';
 
 class PowerPlayMode implements Mode {
-  final int damage = 10;
+  final double winDamage = GameModeType.powerPlay.winDamage;
+  final double lossDamage = GameModeType.powerPlay.lossDamage;
   final CardAttribute player1A1;
   final CardAttribute player1A2;
   final CardAttribute player2A1;
@@ -17,14 +18,14 @@ class PowerPlayMode implements Mode {
     if (firstAttributeResult == ComparisonOutcome.win) {
       return Result(
           activePlayerDamage: 0,
-          opponentPlayerDamage: damage,
+          opponentPlayerDamage: winDamage,
           result: firstAttributeResult);
     }
     final secondAttributeResult = player1A2.compare(player2A2);
     if (secondAttributeResult == ComparisonOutcome.win) {
       return Result(
-          activePlayerDamage: damage,
-          opponentPlayerDamage: 0,
+          activePlayerDamage: lossDamage,
+          opponentPlayerDamage: winDamage,
           result: secondAttributeResult);
     }
     return Result(
