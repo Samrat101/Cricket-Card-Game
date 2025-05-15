@@ -8,9 +8,13 @@ abstract class CricketCardInterface {
   CardAttribute get catches;
   CardAttribute get wickets;
   String get playerName;
-  bool get isSelected;
-  bool get canSelect;
-  bool get isDiscarded;
+  bool isSelected;
+  bool canSelect;
+  bool isDiscarded;
   void updateCardStatus(bool status);
   CardAttribute getAttribute({required String withValue});
+  CricketCardInterface(
+      {required this.isSelected,
+      required this.canSelect,
+      required this.isDiscarded});
 }

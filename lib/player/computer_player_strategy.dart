@@ -1,5 +1,5 @@
-import 'package:cricket_card_game/cricket_card.dart';
+import 'package:cricket_card_game/interfaces/cricket_card_interface.dart';
 
 abstract class ComputerPlayerStrategy {
-  CricketCard playCard(List<CricketCard> cards);
+  CricketCardInterface playCard(List<CricketCardInterface> cards);
 } 

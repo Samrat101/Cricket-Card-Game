@@ -8,7 +8,7 @@ abstract class Player {
   bool _currentLeader = false;
   bool _isTurnPlayer = false;
   double _health = 100;
-  List<CricketCard> _cards = [];
+  List<CricketCardInterface> _cards = [];
   SpecialMode? _specialMode;
   bool specialModeActive = false;
 
@@ -16,9 +16,10 @@ abstract class Player {
   double get health => _health;
   bool get isCurrentLeader => _currentLeader;
   bool get isTurnPlayer => _isTurnPlayer;
-  List<CricketCard> get cards => _cards;
+  List<CricketCardInterface> get cards => _cards;
   SpecialMode? get specialMode => _specialMode;
   bool get isSpecialModeActive => specialModeActive;
+  bool didUseSpecialMode = false;
   CricketCardInterface? currentCard;
   CardAttribute? selectedAttribute;
   void dealCard(List<CricketCard> cards) {
@@ -74,5 +75,5 @@ abstract class Player {
     }
   }
 
-  CricketCard playCard();
+  CricketCardInterface playCard();
 }

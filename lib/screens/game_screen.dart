@@ -113,7 +113,7 @@ class _GameScreenState extends State<GameScreen> {
   }
 
   void cardSeletedCallback(CricketCardInterface card) {
-    game.currentTurnPlayer.currentCard = card;
+    game.updateSelectedCard(card);
     if (game.allCardsSelected()) {
       game.compareCards();
       game.resetCurrentCardsForPlayers();

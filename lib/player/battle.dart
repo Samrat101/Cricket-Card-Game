@@ -62,8 +62,17 @@ class Game {
     }
   }
 
+  void updateSelectedCard(CricketCardInterface card) {
+    currentTurnPlayer.currentCard = card;
+    if (currentTurnPlayer.specialModeActive) {
+      currentTurnPlayer.didUseSpecialMode = true;
+    }
+  }
+
   bool canChangeSpecialMode({required Player player}) {
-    return player.isCurrentLeader && !isRoundInProgress();
+    return player.name == currentRoundLeader?.$1.name &&
+        !player.didUseSpecialMode &&
+        !isRoundInProgress();
   }
 
   bool isRoundInProgress() {
