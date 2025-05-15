@@ -1,4 +1,5 @@
 import 'package:cricket_card_game/interfaces/card_attribute.dart';
+import 'package:cricket_card_game/interfaces/cricket_card_interface.dart';
 import 'package:cricket_card_game/player/player.dart';
 
 class Game {
@@ -27,6 +28,29 @@ class Game {
     for (var element in currentLeader.cards) {
       element.canSelect = true;
     }
+  }
+
+  void setCurrentLeaderCard(CricketCardInterface card) {
+    currentLeader.currentCard = card;
+  }
+
+  void resetCurrentCardsForPlayers() {
+    for (var player in players) {
+      player.currentCard = null;
+    }
+  }
+
+  bool canChangeSpecialMode({required Player player}) {
+    return player.isCurrentLeader && !isRoundInProgress();
+  }
+
+  bool isRoundInProgress() {
+    for (var player in players) {
+      if (player.currentCard != null) {
+        return true;
+      }
+    }
+    return false;
   }
 
   bool isLeaderCardSelected() {

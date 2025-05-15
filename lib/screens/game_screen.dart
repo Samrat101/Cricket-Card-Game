@@ -39,7 +39,17 @@ class _GameScreenState extends State<GameScreen> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: widget.players
-                      .map((player) => PlayerCard(player: player))
+                      .map((player) => PlayerCard(
+                          player: player,
+                          didChangeSpecialModeState: () {
+                            final canChange =
+                                game.canChangeSpecialMode(player: player);
+                            if (canChange) {
+                              player.toggleSpecialMode();
+                              return true;
+                            }
+                            return false;
+                          }))
                       .toList(),
                 ),
                 if (canStartGame && !gameStarted)
@@ -101,14 +111,17 @@ class _GameScreenState extends State<GameScreen> {
   }
 
   void cardSeletedCallback(CricketCardInterface card) {
+    game.setCurrentLeaderCard(card);
     if (game.allCardsSelected()) {
       game.compareCards();
+      game.resetCurrentCardsForPlayers();
       game.nextTurn(); // need to fix this.
       setState(() {});
       return;
     }
     Player player =
         game.selectedAttribute != null ? game.opponent : game.currentLeader;
+    game.setCurrentLeaderCard(card);
     for (var element in player.cards) {
       if (element != card) {
         element.updateCardStatus(false);

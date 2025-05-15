@@ -52,7 +52,7 @@ class _CardGameScreenState extends State<CardGameScreen> {
       List<CricketCard> playerCards = [];
       for (var j = 0; j < allCards.length; j++) {
         if (j % players.length == i) {
-          allCards[j].canSelect = players[i].currentLeader;
+          allCards[j].canSelect = players[i].isCurrentLeader;
           playerCards.add(allCards[j]);
         }
       }

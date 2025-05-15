@@ -1,5 +1,6 @@
 import 'package:cricket_card_game/cricket_card.dart';
 import 'package:cricket_card_game/enums.dart';
+import 'package:cricket_card_game/interfaces/cricket_card_interface.dart';
 
 abstract class Player {
   final String name;
@@ -11,11 +12,11 @@ abstract class Player {
 
   Player(this.name);
   double get health => _health;
-  bool get currentLeader => _currentLeader;
+  bool get isCurrentLeader => _currentLeader;
   List<CricketCard> get cards => _cards;
   SpecialMode? get specialMode => _specialMode;
   bool get isSpecialModeActive => specialModeActive;
-
+  CricketCardInterface? currentCard;
   void dealCard(List<CricketCard> cards) {
     _cards = cards;
   }
@@ -33,6 +34,14 @@ abstract class Player {
   void deActivateSpecialMode() {
     if (_specialMode != null) {
       specialModeActive = false;
+    }
+  }
+
+  void toggleSpecialMode() {
+    if (specialModeActive) {
+      deActivateSpecialMode();
+    } else {
+      activateSpecialMode();
     }
   }
 

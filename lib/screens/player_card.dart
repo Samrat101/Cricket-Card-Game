@@ -3,7 +3,11 @@ import 'package:flutter/material.dart';
 
 class PlayerCard extends StatefulWidget {
   final Player player;
-  const PlayerCard({super.key, required this.player});
+  final bool Function() didChangeSpecialModeState;
+  const PlayerCard(
+      {super.key,
+      required this.player,
+      required this.didChangeSpecialModeState});
 
   @override
   State<PlayerCard> createState() => _PlayerCardState();
@@ -32,19 +36,19 @@ class _PlayerCardState extends State<PlayerCard> {
                       style: const TextStyle(
                           fontSize: 20, fontWeight: FontWeight.bold)),
                   const SizedBox(width: 12),
-                  GestureDetector(
+                  InkWell(
                     onTap: () {
-                      if (widget.player.specialModeActive) {
-                        widget.player.deActivateSpecialMode();
-                      } else {
-                        widget.player.activateSpecialMode();
+                      final canChange = widget.didChangeSpecialModeState();
+                      if (canChange) {
+                        setState(() {});
                       }
-                      setState(() {});
                     },
                     child: Container(
                       decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(8),
-                          color: Colors.red),
+                          color: widget.player.isCurrentLeader
+                              ? Colors.red
+                              : Colors.grey),
                       child: Padding(
                         padding: const EdgeInsets.all(8.0),
                         child: Text(
