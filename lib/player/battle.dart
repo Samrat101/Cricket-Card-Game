@@ -7,6 +7,7 @@ import 'package:cricket_card_game/interfaces/cricket_card_interface.dart';
 import 'package:cricket_card_game/interfaces/game_mode.dart';
 import 'package:cricket_card_game/player/player.dart';
 
+//TODO: make health configurable via battle.
 class Game {
   final List<Player> players;
   int currentLeaderIndex = 0;
@@ -104,6 +105,7 @@ class Game {
     return true;
   }
 
+//TODO break this function.
   void compareCards() {
     if (currentRoundLeader case final roundLeader?) {
       final attributeToCompare = selectedAttribute;

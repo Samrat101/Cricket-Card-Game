@@ -1,5 +1,14 @@
-class SeedData {
-  static List<Map<String, dynamic>> cardAttributes = [
+import 'package:cricket_card_game/cricket_card.dart';
+import 'package:cricket_card_game/interfaces/cricket_card_interface.dart';
+
+abstract class DataService {
+  List<CricketCardInterface> getData();
+  factory DataService() {
+    return SeedData();
+  }
+}
+class SeedData implements DataService {
+  final List<Map<String, dynamic>> _cards = [
     {
       'player_name': 'Virat Kohli',
       'catches': {
@@ -781,4 +790,11 @@ class SeedData {
       },
     }
   ];
+
+  @override
+  List<CricketCardInterface> getData() {
+    return List<CricketCard>.from(
+      _cards.map((e) => CricketCard.fromJson(e)),
+    );
+  }
 }

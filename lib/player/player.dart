@@ -22,7 +22,7 @@ abstract class Player {
   bool didUseSpecialMode = false;
   CricketCardInterface? currentCard;
   CardAttribute? selectedAttribute;
-  void dealCard(List<CricketCard> cards) {
+  void dealCard(List<CricketCardInterface> cards) {
     _cards = cards;
   }
 

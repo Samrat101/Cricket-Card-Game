@@ -40,16 +40,14 @@ class _CardGameScreenState extends State<CardGameScreen> {
 
   void startCardDistributionForPlayers() {
     // Create and shuffle the cards
-    final allCards = List<CricketCard>.from(
-      SeedData.cardAttributes.map((e) => CricketCard.fromJson(e)),
-    )..shuffle();
+    final allCards = DataService().getData()..shuffle();
 
     // Calculate cards per player
     final players = widget.players;
 
     // Distribute cards to each player
     for (var i = 0; i < players.length; i++) {
-      List<CricketCard> playerCards = [];
+      List<CricketCardInterface> playerCards = [];
       for (var j = 0; j < allCards.length; j++) {
         if (j % players.length == i) {
           allCards[j].canSelect = players[i].isCurrentLeader;

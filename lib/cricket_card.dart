@@ -10,12 +10,16 @@ class CricketCard implements CricketCardInterface {
   final CardAttribute _runs;
   final CardAttribute _wickets;
   final String _playerName;
+  bool _isSelected = false;
+  bool _canSelect = false;
+  bool _isDiscarded = false;
+
   @override
-  bool isSelected = false;
+  bool get isSelected => _isSelected;
   @override
-  bool canSelect = false;
+  bool get canSelect => _canSelect;
   @override
-  bool isDiscarded = false;
+  bool get isDiscarded => _isDiscarded;
   @override
   CardAttribute get catches => _catches;
   @override
@@ -30,6 +34,13 @@ class CricketCard implements CricketCardInterface {
   CardAttribute get wickets => _wickets;
   @override
   String get playerName => _playerName;
+
+  @override
+  set isSelected(bool value) => _isSelected = value;
+  @override
+  set canSelect(bool value) => _canSelect = value;
+  @override
+  set isDiscarded(bool value) => _isDiscarded = value;
 
   @override
   void updateCardStatus(bool status) {
@@ -55,12 +66,12 @@ class CricketCard implements CricketCardInterface {
   factory CricketCard.fromJson(Map<String, dynamic> json) {
     return CricketCard(
       playerName: json['player_name'],
-      catches: CardAttribute.fromJson(json['catches']),
-      centuries: CardAttribute.fromJson(json['centuries']),
-      halfCenturies: CardAttribute.fromJson(json['half_centuries']),
-      matches: CardAttribute.fromJson(json['matches']),
-      runs: CardAttribute.fromJson(json['runs']),
-      wickets: CardAttribute.fromJson(json['wickets']),
+      catches: CricketCardAttribute.fromJson(json['catches']),
+      centuries: CricketCardAttribute.fromJson(json['centuries']),
+      halfCenturies: CricketCardAttribute.fromJson(json['half_centuries']),
+      matches: CricketCardAttribute.fromJson(json['matches']),
+      runs: CricketCardAttribute.fromJson(json['runs']),
+      wickets: CricketCardAttribute.fromJson(json['wickets']),
     );
   }
 
