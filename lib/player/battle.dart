@@ -31,7 +31,7 @@ class Game {
     }
   }
 
-  void nextTurn() {
+  void moveToNextRound() {
     selectedAttribute = null;
     for (var player in players) {
       for (var element in player.cards) {
@@ -83,10 +83,10 @@ class Game {
 
   void cardSelectedCallback(CricketCardInterface card) {
     updateSelectedCard(card);
-    if (allCardsSelected()) {
+    if (didAllPlayersSelectedCards()) {
       compareCards();
       resetCurrentCardsForPlayers();
-      nextTurn();
+      moveToNextRound();
       return;
     }
     for (var element in currentTurnPlayer.cards) {
@@ -118,9 +118,9 @@ class Game {
     return currentRoundLeader?.$1.currentCard != null;
   }
 
-  bool allCardsSelected() {
+  bool didAllPlayersSelectedCards() {
     for (var player in players) {
-      if (player.cards.any((card) => card.isSelected)) {
+      if (player.currentCard != null) {
         continue;
       } else {
         return false;
