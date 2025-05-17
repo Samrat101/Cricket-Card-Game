@@ -11,7 +11,7 @@ class GameStartScreen extends StatefulWidget {
 class _GameStartScreenState extends State<GameStartScreen> {
   int? _numPlayers;
   List<String> _playerNames = [];
-  List<Player> _players = [];
+  List<PlayerInterface> _players = [];
   @override
   Widget build(BuildContext context) {
     return Scaffold(

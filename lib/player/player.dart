@@ -1,71 +1,104 @@
-import 'package:cricket_card_game/cricket_card.dart';
 import 'package:cricket_card_game/enums.dart';
-import 'package:cricket_card_game/interfaces/card_attribute.dart';
-import 'package:cricket_card_game/interfaces/cricket_card_interface.dart';
+import 'package:cricket_card_game/interfaces/card/card_attribute.dart';
+import 'package:cricket_card_game/interfaces/card/cricket_card_interface.dart';
 
-abstract class Player {
+abstract class PlayerInterface {
+  String get name;
+  bool get isTurnActive;
+  double get health;
+  List<CricketCardInterface> get cards;
+  SpecialMode? get specialMode;
+  bool get isSpecialModeActive;
+  bool get didUseSpecialMode;
+  CricketCardInterface? get currentCard;
+  CardAttribute? get selectedAttribute;
+
+  set cards(List<CricketCardInterface> cards);
+  set specialMode(SpecialMode? mode);
+  set isSpecialModeActive(bool value);
+  set didUseSpecialMode(bool value);
+  set currentCard(CricketCardInterface? card);
+  set selectedAttribute(CardAttribute? attribute);
+  set isTurnActive(bool value);
+  void updateHealth(double value);
+  void toggleSpecialMode();
+}
+
+class Player implements PlayerInterface {
+  @override
   final String name;
-  bool _currentLeader = false;
-  bool _isTurnPlayer = false;
+  bool _isTurnActive = false;
   double _health = 100;
   List<CricketCardInterface> _cards = [];
   SpecialMode? _specialMode;
-  bool specialModeActive = false;
+  bool _isSpecialModeActive = false;
+  bool _didUseSpecialMode = false;
+  CricketCardInterface? _currentCard;
+  CardAttribute? _selectedAttribute;
 
   Player(this.name);
+  @override
+  bool get isTurnActive => _isTurnActive;
+  @override
   double get health => _health;
-  bool get isCurrentLeader => _currentLeader;
-  bool get isTurnPlayer => _isTurnPlayer;
+  @override
   List<CricketCardInterface> get cards => _cards;
+  @override
   SpecialMode? get specialMode => _specialMode;
-  bool get isSpecialModeActive => specialModeActive;
-  bool didUseSpecialMode = false;
-  CricketCardInterface? currentCard;
-  CardAttribute? selectedAttribute;
-  void dealCard(List<CricketCardInterface> cards) {
-    _cards = cards;
+  @override
+  bool get isSpecialModeActive => _isSpecialModeActive;
+  @override
+  bool get didUseSpecialMode => _didUseSpecialMode;
+  @override
+  CricketCardInterface? get currentCard => _currentCard;
+  @override
+  CardAttribute? get selectedAttribute => _selectedAttribute;
+
+  @override
+  set cards(List<CricketCardInterface> value) {
+    _cards = value;
   }
 
-  void updateSpecialMode(SpecialMode mode) {
-    _specialMode = mode;
+  @override
+  set specialMode(SpecialMode? value) {
+    _specialMode = value;
   }
 
-  void activateSpecialMode() {
-    if (_specialMode != null) {
-      specialModeActive = true;
-    }
+  @override
+  set didUseSpecialMode(bool value) {
+    _didUseSpecialMode = value;
   }
 
-  void deActivateSpecialMode() {
-    if (_specialMode != null) {
-      specialModeActive = false;
-    }
+  @override
+  set isSpecialModeActive(bool value) {
+    _isSpecialModeActive = value;
   }
 
+  @override
   void toggleSpecialMode() {
-    if (specialModeActive) {
-      deActivateSpecialMode();
+    if (isSpecialModeActive) {
+      isSpecialModeActive = false;
     } else {
-      activateSpecialMode();
+      isSpecialModeActive = true;
     }
   }
 
-  void setAsLeader() {
-    _currentLeader = true;
+  @override
+  set isTurnActive(bool value) {
+    _isTurnActive = value;
   }
 
-  void deSetAsLeader() {
-    _currentLeader = false;
+  @override
+  set currentCard(CricketCardInterface? card) {
+    _currentCard = card;
   }
 
-  void setAsTurnPlayer() {
-    _isTurnPlayer = true;
+  @override
+  set selectedAttribute(CardAttribute? attribute) {
+    _selectedAttribute = attribute;
   }
 
-  void deSetAsTurnPlayer() {
-    _isTurnPlayer = false;
-  }
-
+  @override
   void updateHealth(double value) {
     _health = _health + value;
     if (_health < 0) {
@@ -74,6 +107,4 @@ abstract class Player {
       _health = 100;
     }
   }
-
-  CricketCardInterface playCard();
 }

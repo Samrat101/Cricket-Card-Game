@@ -1,6 +1,6 @@
 import 'package:cricket_card_game/comparator.dart';
 import 'package:cricket_card_game/enums.dart';
-import 'package:cricket_card_game/interfaces/card_attribute.dart';
+import 'package:cricket_card_game/interfaces/card/card_attribute.dart';
 import 'package:cricket_card_game/interfaces/game_mode.dart';
 import 'package:cricket_card_game/interfaces/result.dart';
 

@@ -2,7 +2,7 @@ import 'package:cricket_card_game/player/player.dart';
 import 'package:flutter/material.dart';
 
 class PlayerCard extends StatefulWidget {
-  final Player player;
+  final PlayerInterface player;
   final bool Function() didChangeSpecialModeState;
   const PlayerCard(
       {super.key,
@@ -62,7 +62,7 @@ class _PlayerCardState extends State<PlayerCard> {
                       child: Padding(
                         padding: const EdgeInsets.all(8.0),
                         child: Text(
-                            widget.player.specialModeActive
+                            widget.player.isSpecialModeActive
                                 ? 'Deactivate'
                                 : 'Activate',
                             style: const TextStyle(

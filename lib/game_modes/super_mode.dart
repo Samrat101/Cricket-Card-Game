@@ -1,5 +1,5 @@
 import 'package:cricket_card_game/enums.dart';
-import 'package:cricket_card_game/interfaces/cricket_card_interface.dart';
+import 'package:cricket_card_game/interfaces/card/cricket_card_interface.dart';
 import 'package:cricket_card_game/interfaces/game_mode.dart';
 import 'package:cricket_card_game/interfaces/result.dart';
 

@@ -1,6 +1,7 @@
+import 'package:cricket_card_game/cricket_card_attribute.dart';
 import 'package:cricket_card_game/enums.dart';
-import 'package:cricket_card_game/interfaces/card_attribute.dart';
-import 'package:cricket_card_game/interfaces/cricket_card_interface.dart';
+import 'package:cricket_card_game/interfaces/card/card_attribute.dart';
+import 'package:cricket_card_game/interfaces/card/cricket_card_interface.dart';
 
 class CricketCard implements CricketCardInterface {
   final CardAttribute _catches;
@@ -34,17 +35,14 @@ class CricketCard implements CricketCardInterface {
   CardAttribute get wickets => _wickets;
   @override
   String get playerName => _playerName;
-
-  @override
-  set isSelected(bool value) => _isSelected = value;
   @override
   set canSelect(bool value) => _canSelect = value;
   @override
   set isDiscarded(bool value) => _isDiscarded = value;
 
   @override
-  void updateCardStatus(bool status) {
-    isSelected = status;
+  void updateCardSelectedStatus(bool status) {
+    _isSelected = status;
   }
 
   CricketCard({

@@ -2,58 +2,68 @@ import 'package:cricket_card_game/enums.dart';
 import 'package:cricket_card_game/game_modes/power_play_mode.dart';
 import 'package:cricket_card_game/game_modes/standard_mode.dart';
 import 'package:cricket_card_game/game_modes/super_mode.dart';
-import 'package:cricket_card_game/interfaces/card_attribute.dart';
-import 'package:cricket_card_game/interfaces/cricket_card_interface.dart';
+import 'package:cricket_card_game/interfaces/card/card_attribute.dart';
+import 'package:cricket_card_game/interfaces/card/cricket_card_interface.dart';
 import 'package:cricket_card_game/interfaces/game_mode.dart';
 import 'package:cricket_card_game/player/player.dart';
 
 //TODO: make health configurable via battle.
 class Game {
-  final List<Player> players;
-  int currentLeaderIndex = 0;
+  final List<PlayerInterface> players;
   int currentTurnPlayerIndex = 0;
   CardAttribute? selectedAttribute;
   Game(this.players);
-  Player get currentTurnPlayer => players[currentTurnPlayerIndex];
-  Player get currentLeader => players[currentLeaderIndex];
-  Player get opponent => players[(currentLeaderIndex + 1) % players.length];
-  (Player player, int index)? currentRoundLeader;
+  PlayerInterface get currentTurnPlayer => players[currentTurnPlayerIndex];
+  PlayerInterface get nextTurnPlayer =>
+      players[(currentTurnPlayerIndex + 1) % players.length];
+  (PlayerInterface player, int index)? currentRoundLeader;
+  (PlayerInterface player, int index) get nextRoundLeader => (
+        players[nextIndexInRound(afterIndex: currentRoundLeader!.$2)],
+        nextIndexInRound(afterIndex: currentRoundLeader!.$2)
+      );
   void start() {
-    players[currentLeaderIndex].setAsLeader();
-    players[currentTurnPlayerIndex].setAsTurnPlayer();
+    players[currentTurnPlayerIndex].isTurnActive = true;
+    players[currentTurnPlayerIndex].isTurnActive = true;
     currentRoundLeader =
         (players[currentTurnPlayerIndex], currentTurnPlayerIndex);
-    for (var element in players[currentLeaderIndex].cards) {
+    for (var element in players[currentTurnPlayerIndex].cards) {
       element.canSelect = true;
     }
   }
 
   void nextTurn() {
     selectedAttribute = null;
-    currentLeader.deSetAsLeader();
-    currentLeaderIndex = nextIndexInRound(afterIndex: currentLeaderIndex);
-    currentLeader.setAsLeader();
-    for (var element in opponent.cards) {
-      if (element.isSelected) {
-        element.isSelected = false;
-        element.isDiscarded = true;
+    for (var player in players) {
+      for (var element in player.cards) {
+        if (element.isSelected) {
+          element.updateCardSelectedStatus(false);
+          element.isDiscarded = true;
+        }
+        element.canSelect = false;
       }
-      element.canSelect = false;
     }
-    for (var element in currentLeader.cards) {
-      if (element.isSelected) {
-        element.isSelected = false;
-        element.isDiscarded = true;
-      }
+
+    for (var element in nextRoundLeader.$1.cards) {
       element.canSelect = true;
     }
+
+    currentTurnPlayer.isTurnActive = false;
+    currentTurnPlayerIndex = nextRoundLeader.$2;
+    currentTurnPlayer.isTurnActive = true;
+    currentRoundLeader = (players[currentTurnPlayerIndex],currentTurnPlayerIndex);
   }
 
   void moveTurnToNextPlayer() {
-    currentTurnPlayer.deSetAsTurnPlayer();
+    for (var element in nextTurnPlayer.cards) {
+      element.canSelect = true;
+    }
+    for (var element in currentTurnPlayer.cards) {
+      element.canSelect = false;
+    }
+    currentTurnPlayer.isTurnActive = false;
     currentTurnPlayerIndex =
         nextIndexInRound(afterIndex: currentTurnPlayerIndex);
-    currentTurnPlayer.setAsTurnPlayer();
+    currentTurnPlayer.isTurnActive = true;
   }
 
   void resetCurrentCardsForPlayers() {
@@ -65,12 +75,28 @@ class Game {
 
   void updateSelectedCard(CricketCardInterface card) {
     currentTurnPlayer.currentCard = card;
-    if (currentTurnPlayer.specialModeActive) {
+    if (currentTurnPlayer.isSpecialModeActive) {
       currentTurnPlayer.didUseSpecialMode = true;
     }
   }
 
-  bool canChangeSpecialMode({required Player player}) {
+  void cardSelectedCallback(CricketCardInterface card) {
+    updateSelectedCard(card);
+    if (allCardsSelected()) {
+      compareCards();
+      resetCurrentCardsForPlayers();
+      nextTurn();
+      return;
+    }
+    for (var element in currentTurnPlayer.cards) {
+      if (element != card) {
+        element.updateCardSelectedStatus(false);
+      }
+    }
+    moveTurnToNextPlayer();
+  }
+
+  bool canChangeSpecialMode({required PlayerInterface player}) {
     return player.name == currentRoundLeader?.$1.name &&
         !player.didUseSpecialMode &&
         !isRoundInProgress();
@@ -85,13 +111,8 @@ class Game {
     return false;
   }
 
-  bool isLeaderCardSelected() {
-    for (var card in players[currentLeaderIndex].cards) {
-      if (card.isSelected) {
-        return true;
-      }
-    }
-    return false;
+  bool isRoundLeaderCardSelected() {
+    return currentRoundLeader?.$1.currentCard != null;
   }
 
   bool allCardsSelected() {
@@ -113,7 +134,7 @@ class Game {
           ? roundLeader.$1.specialMode
           : null;
       if (attributeToCompare != null) {
-        final List<Player> tiePlayers = [];
+        final List<PlayerInterface> tiePlayers = [];
         final winner = players.reduce((player, nextPlayer) {
           final Mode userSelectedMode;
           final playerAttribute = player.currentCard!
@@ -157,8 +178,6 @@ class Game {
             player.updateHealth(-gamMode.lossDamage);
           }
         }
-        final nextIndex = nextIndexInRound(afterIndex: roundLeader.$2);
-        currentRoundLeader = (players[nextIndex], nextIndex);
       }
     }
   }
@@ -168,28 +187,31 @@ class Game {
   }
 
   void attributeSelected(String attribute) {
-    for (var element in currentLeader.cards) {
+    if (currentRoundLeader == null) {
+      return;
+    }
+    for (var element in currentRoundLeader!.$1.cards) {
       element.canSelect = false;
     }
-    for (var element in opponent.cards) {
+    for (var element in currentTurnPlayer.cards) {
       element.canSelect = true;
     }
     switch (attribute.toLowerCase()) {
       case 'catches':
-        selectedAttribute = players[currentLeaderIndex].cards[0].catches;
+        selectedAttribute = currentRoundLeader!.$1.currentCard?.catches;
       case 'centuries':
-        selectedAttribute = players[currentLeaderIndex].cards[0].centuries;
+        selectedAttribute = currentRoundLeader!.$1.currentCard?.centuries;
       case 'halfCenturies':
-        selectedAttribute = players[currentLeaderIndex].cards[0].halfCenturies;
+        selectedAttribute = currentRoundLeader!.$1.currentCard?.halfCenturies;
       case 'matches':
-        selectedAttribute = players[currentLeaderIndex].cards[0].matches;
+        selectedAttribute = currentRoundLeader!.$1.currentCard?.matches;
       case 'runs':
-        selectedAttribute = players[currentLeaderIndex].cards[0].runs;
+        selectedAttribute = currentRoundLeader!.$1.currentCard?.runs;
       case 'wickets':
-        selectedAttribute = players[currentLeaderIndex].cards[0].wickets;
+        selectedAttribute = currentRoundLeader!.$1.currentCard?.wickets;
       default:
         throw Exception('Invalid attribute');
     }
-    currentRoundLeader?.$1.selectedAttribute = selectedAttribute;
+    currentRoundLeader!.$1.selectedAttribute = selectedAttribute;
   }
 }

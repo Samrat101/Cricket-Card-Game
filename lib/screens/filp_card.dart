@@ -1,5 +1,5 @@
 import 'dart:math';
-import 'package:cricket_card_game/interfaces/cricket_card_interface.dart';
+import 'package:cricket_card_game/interfaces/card/cricket_card_interface.dart';
 import 'package:flutter/material.dart';
 
 class FlipCard extends StatefulWidget {
@@ -72,7 +72,7 @@ class FlipCardState extends State<FlipCard>
         return GestureDetector(
           onTap: () {
             if (widget.card.canSelect && !widget.card.isDiscarded) {
-              widget.card.updateCardStatus(!widget.card.isSelected);
+              widget.card.updateCardSelectedStatus(!widget.card.isSelected);
               widget.cardSeletedCallback(widget.card);
             }
             setState(() {});

@@ -1,6 +1,5 @@
 import 'dart:async';
-import 'package:cricket_card_game/cricket_card.dart';
-import 'package:cricket_card_game/interfaces/cricket_card_interface.dart';
+import 'package:cricket_card_game/interfaces/card/cricket_card_interface.dart';
 import 'package:cricket_card_game/player/player.dart';
 import 'package:cricket_card_game/screens/filp_card.dart';
 import 'package:cricket_card_game/seed_data/seed_data.dart';
@@ -8,7 +7,7 @@ import 'package:flutter/material.dart';
 
 class CardGameScreen extends StatefulWidget {
   final Function onGameStart;
-  final List<Player> players;
+  final List<PlayerInterface> players;
   final Function(CricketCardInterface) cardSeletedCallback;
   const CardGameScreen(
       {super.key,
@@ -50,11 +49,11 @@ class _CardGameScreenState extends State<CardGameScreen> {
       List<CricketCardInterface> playerCards = [];
       for (var j = 0; j < allCards.length; j++) {
         if (j % players.length == i) {
-          allCards[j].canSelect = players[i].isCurrentLeader;
+          allCards[j].canSelect = players[i].isTurnActive;
           playerCards.add(allCards[j]);
         }
       }
-      players[i].dealCard(playerCards);
+      players[i].cards = playerCards;
     }
     players.first.cards.map((e) => e.playerName).toList();
     // Update the local cards list with all cards for UI purposes

@@ -2,7 +2,7 @@ import 'package:cricket_card_game/player/player.dart';
 import 'package:flutter/material.dart';
 
 class ModeDialog extends StatefulWidget {
-  final Player player;
+  final PlayerInterface player;
   const ModeDialog({required this.player});
 
   @override

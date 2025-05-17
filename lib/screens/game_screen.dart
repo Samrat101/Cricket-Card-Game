@@ -1,5 +1,5 @@
 import 'package:cricket_card_game/enums.dart';
-import 'package:cricket_card_game/interfaces/cricket_card_interface.dart';
+import 'package:cricket_card_game/interfaces/card/cricket_card_interface.dart';
 import 'package:cricket_card_game/player/battle.dart';
 import 'package:cricket_card_game/player/player.dart';
 import 'package:cricket_card_game/screens/cards_screen.dart';
@@ -8,7 +8,7 @@ import 'package:cricket_card_game/screens/player_card.dart';
 import 'package:flutter/material.dart';
 
 class GameScreen extends StatefulWidget {
-  final List<Player> players;
+  final List<PlayerInterface> players;
   const GameScreen({super.key, required this.players});
 
   @override
@@ -81,14 +81,12 @@ class _GameScreenState extends State<GameScreen> {
                       width: 300.0,
                       height: 500.0,
                       color: Colors.white,
-                      child: game.isLeaderCardSelected() &&
+                      child: game.isRoundLeaderCardSelected() &&
                               game.selectedAttribute == null
                           ? buildAttributeSelector()
                           : Center(
                               child: Text(
-                                game.selectedAttribute != null
-                                    ? '${game.opponent.name} Please Select A Card'
-                                    : '${game.currentLeader.name} Please Select A Card',
+                                '${game.currentTurnPlayer.name} Please Select A Card',
                                 textAlign: TextAlign.center,
                                 style: const TextStyle(
                                   fontSize: 32,
@@ -113,22 +111,7 @@ class _GameScreenState extends State<GameScreen> {
   }
 
   void cardSeletedCallback(CricketCardInterface card) {
-    game.updateSelectedCard(card);
-    if (game.allCardsSelected()) {
-      game.compareCards();
-      game.resetCurrentCardsForPlayers();
-      game.nextTurn();
-      setState(() {});
-      return;
-    }
-    game.moveTurnToNextPlayer();
-    Player player =
-        game.selectedAttribute != null ? game.opponent : game.currentLeader;
-    for (var element in player.cards) {
-      if (element != card) {
-        element.updateCardStatus(false);
-      }
-    }
+    game.cardSelectedCallback(card);
     setState(() {});
   }
 
@@ -147,7 +130,7 @@ class _GameScreenState extends State<GameScreen> {
       );
       if (selectedValue != null) {
         SpecialMode mode = getSpecialModeFromString(selectedValue)!;
-        player.updateSpecialMode(mode);
+        player.specialMode = mode;
         setState(() {});
       }
     }
@@ -165,7 +148,7 @@ class _GameScreenState extends State<GameScreen> {
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
         Text(
-            '${game.players[game.currentLeaderIndex].name} Please select attribute to compare',
+            '${game.currentRoundLeader?.$1.name} Please select attribute to compare',
             textAlign: TextAlign.center,
             style: const TextStyle(
               fontSize: 32,
