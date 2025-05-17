@@ -94,7 +94,9 @@ class Game {
         element.updateCardSelectedStatus(false);
       }
     }
-    moveTurnToNextPlayer();
+    if (selectedAttribute != null) {
+      moveTurnToNextPlayer();
+    }
   }
 
   bool canChangeSpecialMode({required PlayerInterface player}) {
@@ -191,12 +193,7 @@ class Game {
     if (currentRoundLeader == null) {
       return;
     }
-    for (var element in currentRoundLeader!.$1.cards) {
-      element.canSelect = false;
-    }
-    for (var element in currentTurnPlayer.cards) {
-      element.canSelect = true;
-    }
+    moveTurnToNextPlayer();
     switch (attribute.toLowerCase()) {
       case 'catches':
         selectedAttribute = currentRoundLeader!.$1.currentCard?.catches;
