@@ -15,7 +15,7 @@ class Game {
   Game(this.players);
   PlayerInterface get currentTurnPlayer => players[currentTurnPlayerIndex];
   PlayerInterface get nextTurnPlayer =>
-      players[(currentTurnPlayerIndex + 1) % players.length];
+      players[nextIndexInRound(afterIndex: currentTurnPlayerIndex)];
   (PlayerInterface player, int index)? currentRoundLeader;
   (PlayerInterface player, int index) get nextRoundLeader => (
         players[nextIndexInRound(afterIndex: currentRoundLeader!.$2)],
@@ -50,7 +50,8 @@ class Game {
     currentTurnPlayer.isTurnActive = false;
     currentTurnPlayerIndex = nextRoundLeader.$2;
     currentTurnPlayer.isTurnActive = true;
-    currentRoundLeader = (players[currentTurnPlayerIndex],currentTurnPlayerIndex);
+    currentRoundLeader =
+        (players[currentTurnPlayerIndex], currentTurnPlayerIndex);
   }
 
   void moveTurnToNextPlayer() {
