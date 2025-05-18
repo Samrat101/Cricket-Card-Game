@@ -9,7 +9,7 @@ class Player implements PlayerInterface {
   bool _isTurnActive = false;
   double _health = 100;
   List<CricketCardInterface> _cards = [];
-  SpecialMode? _specialMode;
+  GameModeType? _specialMode;
   bool _isSpecialModeActive = false;
   bool _didUseSpecialMode = false;
   CricketCardInterface? _currentCard;
@@ -23,7 +23,7 @@ class Player implements PlayerInterface {
   @override
   List<CricketCardInterface> get cards => _cards;
   @override
-  SpecialMode? get specialMode => _specialMode;
+  GameModeType? get specialMode => _specialMode;
   @override
   bool get isSpecialModeActive => _isSpecialModeActive;
   @override
@@ -39,7 +39,7 @@ class Player implements PlayerInterface {
   }
 
   @override
-  set specialMode(SpecialMode? value) {
+  set specialMode(GameModeType? value) {
     _specialMode = value;
   }
 

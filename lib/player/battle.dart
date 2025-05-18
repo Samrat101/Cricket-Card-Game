@@ -1,7 +1,9 @@
 import 'package:cricket_card_game/enums.dart';
+import 'package:cricket_card_game/game_modes/free_hit_mode.dart';
 import 'package:cricket_card_game/game_modes/power_play_mode.dart';
 import 'package:cricket_card_game/game_modes/standard_mode.dart';
 import 'package:cricket_card_game/game_modes/super_mode.dart';
+import 'package:cricket_card_game/game_modes/world_cup_mode.dart';
 import 'package:cricket_card_game/interfaces/card/card_attribute.dart';
 import 'package:cricket_card_game/interfaces/card/cricket_card_interface.dart';
 import 'package:cricket_card_game/interfaces/game_mode.dart';
@@ -78,9 +80,6 @@ class Game {
 
   void updateSelectedCard(CricketCardInterface card) {
     currentTurnPlayer.currentCard = card;
-    if (currentTurnPlayer.isSpecialModeActive) {
-      currentTurnPlayer.didUseSpecialMode = true;
-    }
   }
 
   void cardSelectedCallback(CricketCardInterface card) {
@@ -131,14 +130,12 @@ class Game {
     return true;
   }
 
-//TODO break this function.
   void compareCards() {
     if (currentRoundLeader case final roundLeader?) {
-      final attributeToCompare = selectedAttribute;
-      final activeModeIfAny = roundLeader.$1.isSpecialModeActive
-          ? roundLeader.$1.specialMode
-          : null;
-      if (attributeToCompare != null) {
+      if (selectedAttribute case final attributeToCompare?) {
+        final activeModeIfAny = roundLeader.$1.isSpecialModeActive
+            ? roundLeader.$1.specialMode
+            : null;
         final List<PlayerInterface> tiePlayers = [];
         final winner = players.reduce((player, nextPlayer) {
           final Mode userSelectedMode;
@@ -147,7 +144,7 @@ class Game {
           final nextPlayerAttribute = nextPlayer.currentCard!
               .getAttribute(withValue: attributeToCompare.code);
           switch (activeModeIfAny) {
-            case SpecialMode.powerPlayMode:
+            case GameModeType.powerPlay:
               userSelectedMode = PowerPlayMode(
                 playerAttribute,
                 nextPlayerAttribute,
@@ -155,15 +152,24 @@ class Game {
                 nextPlayerAttribute,
               );
               break;
-            case SpecialMode.superMode:
+            case GameModeType.superr:
               userSelectedMode = SuperMode(player.cards, nextPlayer.cards);
               break;
-            case SpecialMode.freeHitMode:
-              userSelectedMode = SuperMode(player.cards, nextPlayer.cards);
+            case GameModeType.freeHit:
+              userSelectedMode = FreeHitMode(
+                  player1CardAttribute: playerAttribute,
+                  player2CardAttribute: nextPlayerAttribute);
               break;
+            case GameModeType.worldCup:
+              final isLastCard = player.cards.length == 1;
+              userSelectedMode = WorldCupMode(
+                  player1CardAttribute: playerAttribute,
+                  player2CardAttribute: nextPlayerAttribute,
+                  isLastCardForActivePlayer: isLastCard);
             default:
-              userSelectedMode =
-                  StandardMode(playerAttribute, nextPlayerAttribute);
+              userSelectedMode = StandardMode(
+                  player1CardAttribute: playerAttribute,
+                  player2CardAttribute: nextPlayerAttribute);
           }
           final comparisonResult = userSelectedMode.result;
           switch (comparisonResult.result) {
@@ -172,16 +178,19 @@ class Game {
             case ComparisonOutcome.loss:
               return nextPlayer;
             case ComparisonOutcome.tie:
-              tiePlayers.add(player);
-              tiePlayers.add(nextPlayer);
+              tiePlayers.addAll([player, nextPlayer]);
               return player;
           }
         });
-        final gamMode = activeModeIfAny?.gameModeType ?? GameModeType.standard;
+        final gamMode = activeModeIfAny ?? GameModeType.standard;
         for (var player in players) {
           if (player.name != winner.name) {
             player.updateHealth(-gamMode.lossDamage);
           }
+        }
+        if (currentTurnPlayer.isSpecialModeActive) {
+          currentTurnPlayer.isSpecialModeActive = false;
+          currentTurnPlayer.didUseSpecialMode = true;
         }
       }
     }

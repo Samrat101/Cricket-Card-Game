@@ -7,14 +7,14 @@ abstract class PlayerInterface {
   bool get isTurnActive;
   double get health;
   List<CricketCardInterface> get cards;
-  SpecialMode? get specialMode;
+  GameModeType? get specialMode;
   bool get isSpecialModeActive;
   bool get didUseSpecialMode;
   CricketCardInterface? get currentCard;
   CardAttribute? get selectedAttribute;
 
   set cards(List<CricketCardInterface> cards);
-  set specialMode(SpecialMode? mode);
+  set specialMode(GameModeType? mode);
   set isSpecialModeActive(bool value);
   set didUseSpecialMode(bool value);
   set currentCard(CricketCardInterface? card);

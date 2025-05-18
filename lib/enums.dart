@@ -15,48 +15,59 @@ enum ComparisionWin {
 
 enum ComparisonOutcome { win, loss, tie }
 
-enum SpecialMode {
-  powerPlayMode('Power Play Mode'),
-  superMode('Super Mode'),
-  freeHitMode('Free Hit Mode');
-
-  final String displayName;
-
-  const SpecialMode(this.displayName);
-
-  GameModeType get gameModeType => switch (this) {
-        SpecialMode.powerPlayMode => GameModeType.powerPlay,
-        SpecialMode.superMode => GameModeType.superr,
-        SpecialMode.freeHitMode => GameModeType.freeHit,
-      };
-}
-
 enum GameModeType {
   standard('standard'),
   powerPlay('powerPlay'),
   superr('super'),
-  freeHit('freeHit');
+  freeHit('freeHit'),
+  worldCup('worldCup');
 
   const GameModeType(this.value);
   final String value;
+  final double _standardDamage = 10;
 
-  double get winDamage => switch (this) {
-        GameModeType.powerPlay => 10,
-        GameModeType.superr => 25,
-        GameModeType.freeHit => 5,
-        GameModeType.standard => 10,
-      };
+  String get displayName {
+    return switch (this) {
+      GameModeType.powerPlay => 'Power Play Mode',
+      GameModeType.superr => 'Super Mode',
+      GameModeType.freeHit => 'Free Hit Mode',
+      GameModeType.standard => 'Standard Mode',
+      GameModeType.worldCup => 'World Cup Mode',
+    };
+  }
 
-  double get lossDamage => switch (this) {
-        GameModeType.powerPlay => 5,
-        GameModeType.superr => 15,
-        GameModeType.freeHit => 0,
-        GameModeType.standard => 10,
-      };
+  static List<GameModeType> get specialModes {
+    return [
+      GameModeType.powerPlay,
+      GameModeType.superr,
+      GameModeType.freeHit,
+      GameModeType.worldCup,
+    ];
+  }
+
+  double get winDamage {
+    return switch (this) {
+      GameModeType.powerPlay => _standardDamage,
+      GameModeType.superr => 25,
+      GameModeType.freeHit => 12.5,
+      GameModeType.standard => _standardDamage,
+      GameModeType.worldCup => _standardDamage * 2,
+    };
+  }
+
+  double get lossDamage {
+    return switch (this) {
+      GameModeType.powerPlay => _standardDamage,
+      GameModeType.superr => _standardDamage,
+      GameModeType.freeHit => 15,
+      GameModeType.standard => _standardDamage,
+      GameModeType.worldCup => _standardDamage,
+    };
+  }
 }
 
-SpecialMode? getSpecialModeFromString(String input) {
-  for (var mode in SpecialMode.values) {
+GameModeType? getSpecialModeFromString(String input) {
+  for (var mode in GameModeType.values) {
     if (mode.displayName.toLowerCase() == input.toLowerCase()) {
       return mode;
     }

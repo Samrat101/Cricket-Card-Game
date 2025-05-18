@@ -5,11 +5,14 @@ import 'package:cricket_card_game/interfaces/game_mode.dart';
 import 'package:cricket_card_game/interfaces/result.dart';
 
 class StandardMode implements Mode {
-  final double winDamage = GameModeType.standard.winDamage;
-  final double lossDamage = GameModeType.standard.lossDamage;
+  @override
+  double get opponentDamage => GameModeType.standard.winDamage;
+  @override
+  double get activePlayerDamage => GameModeType.standard.lossDamage;
   final CardAttribute player1CardAttribute;
   final CardAttribute player2CardAttribute;
-  StandardMode(this.player1CardAttribute, this.player2CardAttribute);
+  StandardMode(
+      {required this.player1CardAttribute, required this.player2CardAttribute});
   @override
   Result get result {
     final outCome = player1CardAttribute.compare(player2CardAttribute);
@@ -17,11 +20,11 @@ class StandardMode implements Mode {
       case ComparisonOutcome.win:
         return Result(
             activePlayerDamage: 0,
-            opponentPlayerDamage: winDamage,
+            opponentPlayerDamage: opponentDamage,
             result: outCome);
       case ComparisonOutcome.loss:
         return Result(
-            activePlayerDamage: lossDamage,
+            activePlayerDamage: activePlayerDamage,
             opponentPlayerDamage: 0,
             result: outCome);
       case ComparisonOutcome.tie:

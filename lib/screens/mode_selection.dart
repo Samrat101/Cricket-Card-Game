@@ -1,3 +1,4 @@
+import 'package:cricket_card_game/enums.dart';
 import 'package:cricket_card_game/player/player_interface.dart';
 import 'package:flutter/material.dart';
 
@@ -12,18 +13,16 @@ class ModeDialog extends StatefulWidget {
 class _ModeDialogState extends State<ModeDialog> {
   String? _selectedMode;
 
-  final List<String> modes = ['Power Play Mode', 'Super Mode', 'Free Hit Mode'];
-
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
       title: Text('${widget.player.name}, select your special mode'),
       content: Column(
         mainAxisSize: MainAxisSize.min,
-        children: modes.map((mode) {
+        children: GameModeType.specialModes.map((mode) {
           return RadioListTile<String>(
-            title: Text(mode),
-            value: mode,
+            title: Text(mode.displayName),
+            value: mode.displayName,
             groupValue: _selectedMode,
             onChanged: (value) {
               setState(() {

@@ -1,9 +1,9 @@
 import 'package:cricket_card_game/enums.dart';
 
 class Result {
-  double activePlayerDamage;
-  double opponentPlayerDamage;
-  ComparisonOutcome result;
+  final double activePlayerDamage;
+  final double opponentPlayerDamage;
+  final ComparisonOutcome result;
   Result({
     required this.activePlayerDamage,
     required this.opponentPlayerDamage,

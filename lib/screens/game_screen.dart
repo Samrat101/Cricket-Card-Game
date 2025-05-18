@@ -129,7 +129,7 @@ class _GameScreenState extends State<GameScreen> {
         builder: (context) => ModeDialog(player: player),
       );
       if (selectedValue != null) {
-        SpecialMode mode = getSpecialModeFromString(selectedValue)!;
+        GameModeType mode = getSpecialModeFromString(selectedValue)!;
         player.specialMode = mode;
         setState(() {});
       }
