@@ -56,21 +56,31 @@ class SuperMode implements Mode {
     final playerWithHighestWickets = players.firstWhere((player) {
       return player.cards.contains(highestWicketsCard);
     });
-    if (playerWithHighestRuns == roundLeader &&
-        playerWithHighestWickets == roundLeader) {
-      return Result(
-          activePlayerDamage: activePlayerDamage,
-          opponentPlayerDamage: opponentDamage,
-          leaderResult: ComparisonOutcome.win,
-          tiedPlayers: [],
-          winnerPlayer: roundLeader);
+    if (playerWithHighestRuns == playerWithHighestWickets) {
+      if (playerWithHighestRuns == roundLeader) {
+        return Result(
+            activePlayerDamage: activePlayerDamage,
+            opponentPlayerDamage: opponentDamage,
+            leaderResult: ComparisonOutcome.win,
+            tiedPlayers: [],
+            winnerPlayer: roundLeader);
+      } else {
+        return Result(
+            activePlayerDamage: activePlayerDamage,
+            opponentPlayerDamage: opponentDamage,
+            leaderResult: ComparisonOutcome.loss,
+            tiedPlayers: [],
+            winnerPlayer: playerWithHighestRuns);
+      }
     } else {
+      // no single player has both highest runs and highest wickets
+      // so no damage for any player
       return Result(
           activePlayerDamage: activePlayerDamage,
           opponentPlayerDamage: opponentDamage,
-          leaderResult: ComparisonOutcome.loss,
-          tiedPlayers: [],
-          winnerPlayer: playerWithHighestRuns);
+          leaderResult: ComparisonOutcome.tie,
+          tiedPlayers: players,
+          winnerPlayer: null);
     }
   }
 }
