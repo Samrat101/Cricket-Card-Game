@@ -17,9 +17,19 @@ enum ComparisonOutcome { win, loss, tie }
 
 enum GameModeType {
   standard('standard'),
+
+  /// Player can compare two attributes instead of one and wins if they have
+  ///  the higher value in either attribute, but damage dealt is reduced to 10%
   powerPlay('powerPlay'),
+
+  /// If the player has both the highest runs card and highest
+  /// wickets card in their hand, they deal 25 damage per win
   superr('super'),
+
+  /// Player deals 12.5% damage when winning but takes 15% damage when losing
   freeHit('freeHit'),
+
+  /// Player's final card deals double damage if they win the comparison
   worldCup('worldCup');
 
   const GameModeType(this.value);
@@ -109,6 +119,7 @@ enum CardAttributeType {
       CardAttributeType.wickets,
     ];
   }
+
   static CardAttributeType? from(String rawValue) {
     return CardAttributeType.values.cast<CardAttributeType?>().firstWhere(
           (element) => element?.value == rawValue,

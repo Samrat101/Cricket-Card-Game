@@ -6,6 +6,7 @@ import 'package:cricket_card_game/game_modes/super_mode.dart';
 import 'package:cricket_card_game/game_modes/world_cup_mode.dart';
 import 'package:cricket_card_game/interfaces/card/cricket_card_interface.dart';
 import 'package:cricket_card_game/interfaces/game_mode.dart';
+import 'package:cricket_card_game/interfaces/result.dart';
 import 'package:cricket_card_game/player/player_interface.dart';
 
 //TODO: make health configurable via battle.
@@ -18,11 +19,11 @@ class Game {
 
   PlayerInterface get currentTurnPlayer => players[_currentTurnPlayerIndex];
   PlayerInterface get _nextTurnPlayer =>
-      players[nextIndexInRound(afterIndex: _currentTurnPlayerIndex)];
+      players[_nextIndexInRound(afterIndex: _currentTurnPlayerIndex)];
   (PlayerInterface player, int index)? currentRoundLeader;
   (PlayerInterface player, int index) get _nextRoundLeader {
     final nextRoundLeaderIndex =
-        nextIndexInRound(afterIndex: currentRoundLeader!.$2);
+        _nextIndexInRound(afterIndex: currentRoundLeader!.$2);
     return (players[nextRoundLeaderIndex], nextRoundLeaderIndex);
   }
 
@@ -68,7 +69,7 @@ class Game {
     }
     currentTurnPlayer.isTurnActive = false;
     _currentTurnPlayerIndex =
-        nextIndexInRound(afterIndex: _currentTurnPlayerIndex);
+        _nextIndexInRound(afterIndex: _currentTurnPlayerIndex);
     currentTurnPlayer.isTurnActive = true;
   }
 
@@ -133,110 +134,128 @@ class Game {
   void compareCards() {
     if (currentRoundLeader case final roundLeader?) {
       if (selectedAttribute case final attributeToCompare?) {
-        final activeModeIfAny = roundLeader.$1.isSpecialModeActive
+        var activeMode = roundLeader.$1.isSpecialModeActive
             ? roundLeader.$1.specialMode
             : null;
-        final gamMode = activeModeIfAny ?? GameModeType.standard;
-        final Mode modeObject;
-        switch (gamMode) {
-          case GameModeType.standard:
-            modeObject = StandardMode(
-                players: players,
-                roundLeader: roundLeader.$1,
-                cardAttributeType: attributeToCompare);
-            final result = modeObject.result;
-            if (result.tiedPlayers.isNotEmpty) {
-              final nonTiePlayers =
-                  players.where((e) => !result.tiedPlayers.contains(e));
-              for (var player in nonTiePlayers) {
-                if (player.id != result.winnerPlayer?.id) {
-                  player.updateHealth(-result.opponentPlayerDamage);
-                }
-              }
-            } else {
-              for (var player in players) {
-                if (player.id != result.winnerPlayer?.id) {
-                  player.updateHealth(-result.opponentPlayerDamage);
-                }
-              }
-            }
-            break;
-          case GameModeType.powerPlay:
-            modeObject = PowerPlayMode(
-                players: players,
-                roundLeader: roundLeader.$1,
-                cardAttributeType: attributeToCompare,
-                cardAttributeType2: attributeToCompare);
-            final result = modeObject.result;
-            for (var player in players) {
-              if (player.id != result.winnerPlayer?.id) {
-                player.updateHealth(-result.opponentPlayerDamage);
-              }
-            }
-            break;
-          case GameModeType.superr:
-            modeObject = SuperMode(
-                players: players,
-                roundLeader: roundLeader.$1,
-                gameCards: roundLeader.$1.cards);
-            final result = modeObject.result;
-            for (var player in players) {
-              if (player.id != result.winnerPlayer?.id) {
-                player.updateHealth(-result.opponentPlayerDamage);
-              }
-            }
-          case GameModeType.freeHit:
-            modeObject = FreeHitMode(
-                players: players,
-                roundLeader: roundLeader.$1,
-                cardAttributeType: attributeToCompare);
-            final result = modeObject.result;
-            if (result.leaderResult == ComparisonOutcome.win) {
-              for (var player in players) {
-                if (player.id != result.winnerPlayer?.id) {
-                  player.updateHealth(-result.opponentPlayerDamage);
-                }
-              }
-            } else {
-              roundLeader.$1.updateHealth(-result.activePlayerDamage);
-              for (var player in players) {
-                if (player.id != roundLeader.$1.id &&
-                    player.id != result.winnerPlayer?.id) {
-                  player.updateHealth(-GameModeType.standard.lossDamage);
-                }
-              }
-            }
-            break;
-          case GameModeType.worldCup:
-            final isLastCardForActivePlayer =
-                roundLeader.$1.cards.where((e) => !e.isDiscarded).length == 1;
-            modeObject = WorldCupMode(
-                players: players,
-                roundLeader: roundLeader.$1,
-                cardAttributeType: attributeToCompare,
-                isLastCardForActivePlayer: isLastCardForActivePlayer);
-            final result = modeObject.result;
-            for (var player in players) {
-              if (player.id != result.winnerPlayer?.id) {
-                player.updateHealth(-result.opponentPlayerDamage);
-              }
-            }
-            if (isLastCardForActivePlayer) {
-              currentTurnPlayer.isSpecialModeActive = false;
-              currentTurnPlayer.didUseSpecialMode = true;
-            }
-        }
-        if (gamMode != GameModeType.worldCup) {
-          if (currentTurnPlayer.isSpecialModeActive) {
-            currentTurnPlayer.isSpecialModeActive = false;
-            currentTurnPlayer.didUseSpecialMode = true;
-          }
-        }
+        activeMode ??= GameModeType.standard;
+        final Mode modeObject =
+            createModeObject(activeMode, roundLeader.$1, attributeToCompare);
+        final result = modeObject.result;
+        _calculateAndupdatePlayerHealth(activeMode, result, roundLeader.$1);
+        _updateSpecialModeState(activeMode);
       }
     }
   }
 
-  int nextIndexInRound({required int afterIndex}) {
+  Mode createModeObject(GameModeType gamMode, PlayerInterface roundLeader,
+      CardAttributeType attributeToCompare) {
+    switch (gamMode) {
+      case GameModeType.standard:
+        return StandardMode(
+            players: players,
+            roundLeader: roundLeader,
+            cardAttributeType: attributeToCompare);
+      case GameModeType.powerPlay:
+        return PowerPlayMode(
+            players: players,
+            roundLeader: roundLeader,
+            cardAttributeType: attributeToCompare,
+            cardAttributeType2: attributeToCompare);
+      case GameModeType.superr:
+        return SuperMode(
+            players: players,
+            roundLeader: roundLeader,
+            gameCards: roundLeader.cards);
+      case GameModeType.freeHit:
+        return FreeHitMode(
+            players: players,
+            roundLeader: roundLeader,
+            cardAttributeType: attributeToCompare);
+      case GameModeType.worldCup:
+        final isLastCardForActivePlayer =
+            roundLeader.cards.where((e) => !e.isDiscarded).length == 1;
+        return WorldCupMode(
+            players: players,
+            roundLeader: roundLeader,
+            cardAttributeType: attributeToCompare,
+            isLastCardForActivePlayer: isLastCardForActivePlayer);
+    }
+  }
+
+  void _calculateAndupdatePlayerHealth(
+      GameModeType gamMode, Result result, PlayerInterface roundLeader) {
+    switch (gamMode) {
+      case GameModeType.standard:
+        if (result.tiedPlayers.isNotEmpty) {
+          final nonTiePlayers =
+              players.where((e) => !result.tiedPlayers.contains(e));
+          _updatePlayersHealth(nonTiePlayers, result);
+        } else {
+          _updatePlayersHealth(players, result);
+        }
+      case GameModeType.powerPlay:
+      case GameModeType.superr:
+        _updatePlayersHealth(players, result);
+      case GameModeType.freeHit:
+        if (result.leaderResult == ComparisonOutcome.win) {
+          _updatePlayersHealth(players, result);
+        } else {
+          if (result.tiedPlayers.isNotEmpty) {
+            final didLeaderGotTied = result.tiedPlayers.contains(roundLeader);
+            if (didLeaderGotTied) {
+              final nonTiedPlayers =
+                  players.where((e) => !result.tiedPlayers.contains(e));
+              _updatePlayersHealth(nonTiedPlayers, result);
+            } else {
+              roundLeader.updateHealth(-result.activePlayerDamage);
+              final playersOtherThanLeader =
+                  players.where((e) => e.id != roundLeader.id);
+              _updatePlayersHealth(playersOtherThanLeader, result);
+            }
+          } else {
+            roundLeader.updateHealth(-result.activePlayerDamage);
+            final playersOtherThanLeader =
+                players.where((e) => e.id != roundLeader.id);
+            _updatePlayersHealth(playersOtherThanLeader, result);
+          }
+        }
+      case GameModeType.worldCup:
+        if (result.tiedPlayers.isNotEmpty) {
+          final nonTiePlayers =
+              players.where((e) => !result.tiedPlayers.contains(e));
+          _updatePlayersHealth(nonTiePlayers, result);
+        } else {
+          _updatePlayersHealth(players, result);
+        }
+        final isLastCardForActivePlayer =
+            roundLeader.cards.where((e) => !e.isDiscarded).length == 1;
+        if (isLastCardForActivePlayer) {
+          currentTurnPlayer.isSpecialModeActive = false;
+          currentTurnPlayer.didUseSpecialMode = true;
+        }
+    }
+  }
+
+  /// updates all players who are not winner
+  /// with -{Result.opponentPlayerDamage}
+  void _updatePlayersHealth(Iterable<PlayerInterface> players, Result result) {
+    for (var player in players) {
+      if (player.id != result.winnerPlayer?.id) {
+        player.updateHealth(-result.opponentPlayerDamage);
+      }
+    }
+  }
+
+  void _updateSpecialModeState(GameModeType gamMode) {
+    if (gamMode == GameModeType.worldCup) return;
+
+    if (currentTurnPlayer.isSpecialModeActive) {
+      currentTurnPlayer.isSpecialModeActive = false;
+      currentTurnPlayer.didUseSpecialMode = true;
+    }
+  }
+
+  int _nextIndexInRound({required int afterIndex}) {
     return (afterIndex + 1) % players.length;
   }
 
@@ -269,5 +288,17 @@ Questions:
   - A selected 2 attributes, and got lost in one and a tied with B in another one.
   - does he deal damage? . and what will be the damage to 
   C and D.
+4. Super mode:
+  - If the player has both the highest runs card and highest
+  wickets card in their hand, they deal 25 damage per win
+  - In A,B,C,D A is the leader. and A didn't have highest runs,wickets
+  But C has it. What will be the damage for A,B,D. 10 or 25?
+  - In A,B,C,D A is the leader. and A didn't have highest runs,wickets
+  But C has highest runs and D has highest wickets. 
+  What will be the damage for A,B,CD. 10 or 25?
+5. World cup mode:
+  - let say there are  players A,B,C,D
+  - A did not win the round. D did. damage for A,B,C, will be 10 ?
+  
 */
 
