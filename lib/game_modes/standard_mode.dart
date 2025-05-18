@@ -61,6 +61,6 @@ class StandardMode implements Mode {
                 ? ComparisonOutcome.tie
                 : ComparisonOutcome.loss,
         tiedPlayers: tiedPlayers,
-        winnerPlayer: winnerPlayer);
+        winnerPlayer: tiedPlayers.isEmpty ? winnerPlayer : null);
   }
 }

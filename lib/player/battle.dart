@@ -145,9 +145,19 @@ class Game {
                 roundLeader: roundLeader.$1,
                 cardAttributeType: attributeToCompare);
             final result = modeObject.result;
-            for (var player in players) {
-              if (player.id != result.winnerPlayer?.id) {
-                player.updateHealth(-result.opponentPlayerDamage);
+            if (result.tiedPlayers.isNotEmpty) {
+              final nonTiePlayers =
+                  players.where((e) => !result.tiedPlayers.contains(e));
+              for (var player in nonTiePlayers) {
+                if (player.id != result.winnerPlayer?.id) {
+                  player.updateHealth(-result.opponentPlayerDamage);
+                }
+              }
+            } else {
+              for (var player in players) {
+                if (player.id != result.winnerPlayer?.id) {
+                  player.updateHealth(-result.opponentPlayerDamage);
+                }
               }
             }
             break;
@@ -250,4 +260,14 @@ Questions:
   - according to rule, if win deals 12.5 damage to opponents and if
     lose 15 damage to self
   - If player B wins, then 
+2. Standard mode:
+  - let say there are 4 players
+  - if roundLeader loses, and there is a tie between B and C.
+  what will be the damage to A , D.
+3. Powerplay mode:
+  - let say there are 4 players
+  - A selected 2 attributes, and got lost in one and a tied with B in another one.
+  - does he deal damage? . and what will be the damage to 
+  C and D.
 */
+

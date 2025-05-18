@@ -67,6 +67,6 @@ class PowerPlayMode implements Mode {
         opponentPlayerDamage: opponentDamage,
         leaderResult: tied ? ComparisonOutcome.tie : ComparisonOutcome.loss,
         tiedPlayers: secondAttributeResult.tiedPlayers,
-        winnerPlayer: firstAttributeResult.winnerPlayer);
+        winnerPlayer: tied ? null : firstAttributeResult.winnerPlayer);
   }
 }
