@@ -186,24 +186,11 @@ class Game {
       GameModeType gamMode, Result result, PlayerInterface roundLeader) {
     switch (gamMode) {
       case GameModeType.standard:
-        if (result.tiedPlayers.isNotEmpty) {
-          final nonTiePlayers =
-              players.where((e) => !result.tiedPlayers.contains(e));
-          _updatePlayersHealthForLeaderDamage(nonTiePlayers, result);
-        } else {
-          _updatePlayersHealthForLeaderDamage(players, result);
-        }
+        _updatePlayersHealth(result);
       case GameModeType.powerPlay:
+        _updatePlayersHealth(result);
       case GameModeType.superr:
-        if (result.leaderResult == ComparisonOutcome.win) {
-          _updatePlayersHealthForLeaderDamage(players, result);
-        } else if (result.tiedPlayers.isNotEmpty) {
-          final nonTiedPlayers =
-              players.where((e) => !result.tiedPlayers.contains(e));
-          _updatePlayersHealthForNonLeaderDamage(nonTiedPlayers, result);
-        } else {
-          _updatePlayersHealthForNonLeaderDamage(players, result);
-        }
+        _updatePlayersHealth(result);
       case GameModeType.freeHit:
         if (result.leaderResult == ComparisonOutcome.win) {
           _updatePlayersHealthForLeaderDamage(players, result);
@@ -222,21 +209,25 @@ class Game {
           }
         }
       case GameModeType.worldCup:
-        if (result.leaderResult == ComparisonOutcome.win) {
-          _updatePlayersHealthForLeaderDamage(players, result);
-        } else if (result.tiedPlayers.isNotEmpty) {
-          final nonTiePlayers =
-              players.where((e) => !result.tiedPlayers.contains(e));
-          _updatePlayersHealthForNonLeaderDamage(nonTiePlayers, result);
-        } else {
-          _updatePlayersHealthForNonLeaderDamage(players, result);
-        }
+        _updatePlayersHealth(result);
         final isLastCardForActivePlayer =
             roundLeader.cards.where((e) => !e.isDiscarded).length == 1;
         if (isLastCardForActivePlayer) {
           currentTurnPlayer.isSpecialModeActive = false;
           currentTurnPlayer.didUseSpecialMode = true;
         }
+    }
+  }
+
+  void _updatePlayersHealth(Result result) {
+    if (result.leaderResult == ComparisonOutcome.win) {
+      _updatePlayersHealthForLeaderDamage(players, result);
+    } else if (result.tiedPlayers.isNotEmpty) {
+      final nonTiePlayers =
+          players.where((e) => !result.tiedPlayers.contains(e));
+      _updatePlayersHealthForNonLeaderDamage(nonTiePlayers, result);
+    } else {
+      _updatePlayersHealthForNonLeaderDamage(players, result);
     }
   }
 
@@ -293,35 +284,3 @@ class Game {
     _moveTurnToNextPlayer();
   }
 }
-
-
-/*
-Questions:
-1. Free hit mode:
-  - let say there are 4 players
-  - according to rule, if win deals 12.5 damage to opponents and if
-    lose 15 damage to self
-  - If player B wins, then 
-2. Standard mode:
-  - let say there are 4 players
-  - if roundLeader loses, and there is a tie between B and C.
-  what will be the damage to A , D.
-3. Powerplay mode:
-  - let say there are 4 players
-  - A selected 2 attributes, and got lost in one and a tied with B in another one.
-  - does he deal damage? . and what will be the damage to 
-  C and D.
-4. Super mode:
-  - If the player has both the highest runs card and highest
-  wickets card in their hand, they deal 25 damage per win
-  - In A,B,C,D A is the leader. and A didn't have highest runs,wickets
-  But C has it. What will be the damage for A,B,D. 10 or 25?
-  - In A,B,C,D A is the leader. and A didn't have highest runs,wickets
-  But C has highest runs and D has highest wickets. 
-  What will be the damage for A,B,CD. 10 or 25?
-5. World cup mode:
-  - let say there are  players A,B,C,D
-  - A did not win the round. D did. damage for A,B,C, will be 10 ?
-  
-*/
-

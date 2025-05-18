@@ -33,7 +33,7 @@ class PowerPlayMode implements Mode {
             cardAttributeType: cardAttributeType2,
             roundLeader: roundLeader)
         .result;
-    var tied = false;
+    var tiedPlayers = <PlayerInterface>[];
     switch (firstAttributeResult.leaderResult) {
       case ComparisonOutcome.win:
         return Result(
@@ -45,7 +45,7 @@ class PowerPlayMode implements Mode {
       case ComparisonOutcome.loss:
         break;
       case ComparisonOutcome.tie:
-        tied = true;
+        tiedPlayers.addAll(firstAttributeResult.tiedPlayers);
         break;
     }
     switch (secondAttributeResult.leaderResult) {
@@ -59,14 +59,19 @@ class PowerPlayMode implements Mode {
       case ComparisonOutcome.loss:
         break;
       case ComparisonOutcome.tie:
-        tied = true;
+        tiedPlayers.addAll(secondAttributeResult.tiedPlayers);
         break;
     }
     return Result(
         activePlayerDamage: activePlayerDamage,
         opponentPlayerDamage: opponentDamage,
-        leaderResult: tied ? ComparisonOutcome.tie : ComparisonOutcome.loss,
-        tiedPlayers: secondAttributeResult.tiedPlayers,
-        winnerPlayer: tied ? null : firstAttributeResult.winnerPlayer);
+        leaderResult: tiedPlayers.isNotEmpty
+            ? ComparisonOutcome.tie
+            : ComparisonOutcome.loss,
+        tiedPlayers: tiedPlayers.isNotEmpty
+            ? tiedPlayers
+            : secondAttributeResult.tiedPlayers,
+        winnerPlayer:
+            tiedPlayers.isNotEmpty ? null : secondAttributeResult.winnerPlayer);
   }
 }
