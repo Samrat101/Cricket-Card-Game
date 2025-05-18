@@ -102,7 +102,7 @@ class Game {
   }
 
   bool canChangeSpecialMode({required PlayerInterface player}) {
-    return player.name == currentRoundLeader?.$1.name &&
+    return player.id == currentRoundLeader?.$1.id &&
         !player.didUseSpecialMode &&
         !_isRoundInProgress();
   }
