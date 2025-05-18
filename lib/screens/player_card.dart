@@ -58,13 +58,17 @@ class _PlayerCardState extends State<PlayerCard> {
                     child: Container(
                       decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(8),
-                          color: Colors.red),
+                          color: widget.player.didUseSpecialMode
+                              ? Colors.grey
+                              : Colors.red),
                       child: Padding(
                         padding: const EdgeInsets.all(8.0),
                         child: Text(
-                            widget.player.isSpecialModeActive
-                                ? 'Deactivate'
-                                : 'Activate',
+                            widget.player.didUseSpecialMode
+                                ? 'Used'
+                                : widget.player.isSpecialModeActive
+                                    ? 'Deactivate'
+                                    : 'Activate',
                             style: const TextStyle(
                                 fontSize: 14, fontWeight: FontWeight.bold)),
                       ),

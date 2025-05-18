@@ -165,7 +165,7 @@ class Game {
         return SuperMode(
             players: players,
             roundLeader: roundLeader,
-            gameCards: roundLeader.cards);
+            gameCards: cards);
       case GameModeType.freeHit:
         return FreeHitMode(
             players: players,
@@ -263,9 +263,9 @@ class Game {
   void _updateSpecialModeState(GameModeType gamMode) {
     if (gamMode == GameModeType.worldCup) return;
 
-    if (currentTurnPlayer.isSpecialModeActive) {
-      currentTurnPlayer.isSpecialModeActive = false;
-      currentTurnPlayer.didUseSpecialMode = true;
+    if (currentRoundLeader?.$1.isSpecialModeActive == true) {
+      currentRoundLeader?.$1.isSpecialModeActive = false;
+      currentRoundLeader?.$1.didUseSpecialMode = true;
     }
   }
 
