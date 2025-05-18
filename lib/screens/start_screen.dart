@@ -1,5 +1,5 @@
 import 'package:cricket_card_game/player/human_player.dart';
-import 'package:cricket_card_game/player/player.dart';
+import 'package:cricket_card_game/player/player_interface.dart';
 import 'package:cricket_card_game/screens/game_screen.dart';
 import 'package:flutter/material.dart';
 

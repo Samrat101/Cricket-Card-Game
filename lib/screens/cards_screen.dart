@@ -1,6 +1,6 @@
 import 'dart:async';
 import 'package:cricket_card_game/interfaces/card/cricket_card_interface.dart';
-import 'package:cricket_card_game/player/player.dart';
+import 'package:cricket_card_game/player/player_interface.dart';
 import 'package:cricket_card_game/screens/filp_card.dart';
 import 'package:cricket_card_game/seed_data/seed_data.dart';
 import 'package:flutter/material.dart';

@@ -1,4 +1,4 @@
-import 'package:cricket_card_game/player/player.dart';
+import 'package:cricket_card_game/player/player_interface.dart';
 import 'package:flutter/material.dart';
 
 class ModeDialog extends StatefulWidget {

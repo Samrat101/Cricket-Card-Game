@@ -5,7 +5,7 @@ import 'package:cricket_card_game/game_modes/super_mode.dart';
 import 'package:cricket_card_game/interfaces/card/card_attribute.dart';
 import 'package:cricket_card_game/interfaces/card/cricket_card_interface.dart';
 import 'package:cricket_card_game/interfaces/game_mode.dart';
-import 'package:cricket_card_game/player/player.dart';
+import 'package:cricket_card_game/player/player_interface.dart';
 
 //TODO: make health configurable via battle.
 class Game {

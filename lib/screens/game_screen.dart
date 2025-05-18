@@ -1,7 +1,7 @@
 import 'package:cricket_card_game/enums.dart';
 import 'package:cricket_card_game/interfaces/card/cricket_card_interface.dart';
 import 'package:cricket_card_game/player/battle.dart';
-import 'package:cricket_card_game/player/player.dart';
+import 'package:cricket_card_game/player/player_interface.dart';
 import 'package:cricket_card_game/screens/cards_screen.dart';
 import 'package:cricket_card_game/screens/mode_selection.dart';
 import 'package:cricket_card_game/screens/player_card.dart';
