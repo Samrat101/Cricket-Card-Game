@@ -2,6 +2,7 @@ import 'package:cricket_card_game/cricket_card_attribute.dart';
 import 'package:cricket_card_game/enums.dart';
 import 'package:cricket_card_game/interfaces/card/card_attribute.dart';
 import 'package:cricket_card_game/interfaces/card/cricket_card_interface.dart';
+import 'package:uuid/uuid.dart';
 
 class CricketCard implements CricketCardInterface {
   final CardAttribute _catches;
@@ -14,7 +15,7 @@ class CricketCard implements CricketCardInterface {
   bool _isSelected = false;
   bool _canSelect = false;
   bool _isDiscarded = false;
-
+  final String _id;
   @override
   bool get isSelected => _isSelected;
   @override
@@ -59,7 +60,8 @@ class CricketCard implements CricketCardInterface {
         _matches = matches,
         _runs = runs,
         _wickets = wickets,
-        _playerName = playerName;
+        _playerName = playerName,
+        _id = const Uuid().v4();
 
   factory CricketCard.fromJson(Map<String, dynamic> json) {
     return CricketCard(
@@ -96,4 +98,7 @@ class CricketCard implements CricketCardInterface {
         throw Exception('Invalid attribute');
     }
   }
+
+  @override
+  String get id => _id;
 }

@@ -4,7 +4,6 @@ import 'package:cricket_card_game/game_modes/power_play_mode.dart';
 import 'package:cricket_card_game/game_modes/standard_mode.dart';
 import 'package:cricket_card_game/game_modes/super_mode.dart';
 import 'package:cricket_card_game/game_modes/world_cup_mode.dart';
-import 'package:cricket_card_game/interfaces/card/card_attribute.dart';
 import 'package:cricket_card_game/interfaces/card/cricket_card_interface.dart';
 import 'package:cricket_card_game/interfaces/game_mode.dart';
 import 'package:cricket_card_game/player/player_interface.dart';
@@ -12,9 +11,11 @@ import 'package:cricket_card_game/player/player_interface.dart';
 //TODO: make health configurable via battle.
 class Game {
   final List<PlayerInterface> players;
+  final List<CricketCardInterface> cards;
   int _currentTurnPlayerIndex = 0;
-  CardAttribute? selectedAttribute;
-  Game(this.players);
+  CardAttributeType? selectedAttribute;
+  Game(this.players, this.cards);
+
   PlayerInterface get currentTurnPlayer => players[_currentTurnPlayerIndex];
   PlayerInterface get _nextTurnPlayer =>
       players[nextIndexInRound(afterIndex: _currentTurnPlayerIndex)];
@@ -74,7 +75,6 @@ class Game {
   void resetCurrentCardsForPlayers() {
     for (var player in players) {
       player.currentCard = null;
-      player.selectedAttribute = null;
     }
   }
 
@@ -136,61 +136,91 @@ class Game {
         final activeModeIfAny = roundLeader.$1.isSpecialModeActive
             ? roundLeader.$1.specialMode
             : null;
-        final List<PlayerInterface> tiePlayers = [];
-        final winner = players.reduce((player, nextPlayer) {
-          final Mode userSelectedMode;
-          final playerAttribute = player.currentCard!
-              .getAttribute(withValue: attributeToCompare.code);
-          final nextPlayerAttribute = nextPlayer.currentCard!
-              .getAttribute(withValue: attributeToCompare.code);
-          switch (activeModeIfAny) {
-            case GameModeType.powerPlay:
-              userSelectedMode = PowerPlayMode(
-                playerAttribute,
-                nextPlayerAttribute,
-                playerAttribute,
-                nextPlayerAttribute,
-              );
-              break;
-            case GameModeType.superr:
-              userSelectedMode = SuperMode(player.cards, nextPlayer.cards);
-              break;
-            case GameModeType.freeHit:
-              userSelectedMode = FreeHitMode(
-                  player1CardAttribute: playerAttribute,
-                  player2CardAttribute: nextPlayerAttribute);
-              break;
-            case GameModeType.worldCup:
-              final isLastCard = player.cards.length == 1;
-              userSelectedMode = WorldCupMode(
-                  player1CardAttribute: playerAttribute,
-                  player2CardAttribute: nextPlayerAttribute,
-                  isLastCardForActivePlayer: isLastCard);
-            default:
-              userSelectedMode = StandardMode(
-                  player1CardAttribute: playerAttribute,
-                  player2CardAttribute: nextPlayerAttribute);
-          }
-          final comparisonResult = userSelectedMode.result;
-          switch (comparisonResult.result) {
-            case ComparisonOutcome.win:
-              return player;
-            case ComparisonOutcome.loss:
-              return nextPlayer;
-            case ComparisonOutcome.tie:
-              tiePlayers.addAll([player, nextPlayer]);
-              return player;
-          }
-        });
         final gamMode = activeModeIfAny ?? GameModeType.standard;
-        for (var player in players) {
-          if (player.name != winner.name) {
-            player.updateHealth(-gamMode.lossDamage);
-          }
+        final Mode modeObject;
+        switch (gamMode) {
+          case GameModeType.standard:
+            modeObject = StandardMode(
+                players: players,
+                roundLeader: roundLeader.$1,
+                cardAttributeType: attributeToCompare);
+            final result = modeObject.result;
+            for (var player in players) {
+              if (player.id != result.winnerPlayer?.id) {
+                player.updateHealth(-result.opponentPlayerDamage);
+              }
+            }
+            break;
+          case GameModeType.powerPlay:
+            modeObject = PowerPlayMode(
+                players: players,
+                roundLeader: roundLeader.$1,
+                cardAttributeType: attributeToCompare,
+                cardAttributeType2: attributeToCompare);
+            final result = modeObject.result;
+            for (var player in players) {
+              if (player.id != result.winnerPlayer?.id) {
+                player.updateHealth(-result.opponentPlayerDamage);
+              }
+            }
+            break;
+          case GameModeType.superr:
+            modeObject = SuperMode(
+                players: players,
+                roundLeader: roundLeader.$1,
+                gameCards: roundLeader.$1.cards);
+            final result = modeObject.result;
+            for (var player in players) {
+              if (player.id != result.winnerPlayer?.id) {
+                player.updateHealth(-result.opponentPlayerDamage);
+              }
+            }
+          case GameModeType.freeHit:
+            modeObject = FreeHitMode(
+                players: players,
+                roundLeader: roundLeader.$1,
+                cardAttributeType: attributeToCompare);
+            final result = modeObject.result;
+            if (result.leaderResult == ComparisonOutcome.win) {
+              for (var player in players) {
+                if (player.id != result.winnerPlayer?.id) {
+                  player.updateHealth(-result.opponentPlayerDamage);
+                }
+              }
+            } else {
+              roundLeader.$1.updateHealth(-result.activePlayerDamage);
+              for (var player in players) {
+                if (player.id != roundLeader.$1.id &&
+                    player.id != result.winnerPlayer?.id) {
+                  player.updateHealth(-GameModeType.standard.lossDamage);
+                }
+              }
+            }
+            break;
+          case GameModeType.worldCup:
+            final isLastCardForActivePlayer =
+                roundLeader.$1.cards.where((e) => !e.isDiscarded).length == 1;
+            modeObject = WorldCupMode(
+                players: players,
+                roundLeader: roundLeader.$1,
+                cardAttributeType: attributeToCompare,
+                isLastCardForActivePlayer: isLastCardForActivePlayer);
+            final result = modeObject.result;
+            for (var player in players) {
+              if (player.id != result.winnerPlayer?.id) {
+                player.updateHealth(-result.opponentPlayerDamage);
+              }
+            }
+            if (isLastCardForActivePlayer) {
+              currentTurnPlayer.isSpecialModeActive = false;
+              currentTurnPlayer.didUseSpecialMode = true;
+            }
         }
-        if (currentTurnPlayer.isSpecialModeActive) {
-          currentTurnPlayer.isSpecialModeActive = false;
-          currentTurnPlayer.didUseSpecialMode = true;
+        if (gamMode != GameModeType.worldCup) {
+          if (currentTurnPlayer.isSpecialModeActive) {
+            currentTurnPlayer.isSpecialModeActive = false;
+            currentTurnPlayer.didUseSpecialMode = true;
+          }
         }
       }
     }
@@ -201,26 +231,23 @@ class Game {
   }
 
   void attributeSelected(String attribute) {
+    final attributeType = CardAttributeType.from(attribute);
+    if (attributeType != null) {
+      selectedAttribute = attributeType;
+    }
     if (currentRoundLeader == null) {
       return;
     }
     moveTurnToNextPlayer();
-    switch (attribute.toLowerCase()) {
-      case 'catches':
-        selectedAttribute = currentRoundLeader!.$1.currentCard?.catches;
-      case 'centuries':
-        selectedAttribute = currentRoundLeader!.$1.currentCard?.centuries;
-      case 'halfCenturies':
-        selectedAttribute = currentRoundLeader!.$1.currentCard?.halfCenturies;
-      case 'matches':
-        selectedAttribute = currentRoundLeader!.$1.currentCard?.matches;
-      case 'runs':
-        selectedAttribute = currentRoundLeader!.$1.currentCard?.runs;
-      case 'wickets':
-        selectedAttribute = currentRoundLeader!.$1.currentCard?.wickets;
-      default:
-        throw Exception('Invalid attribute');
-    }
-    currentRoundLeader!.$1.selectedAttribute = selectedAttribute;
   }
 }
+
+
+/*
+Questions:
+1. Free hit mode:
+  - let say there are 4 players
+  - according to rule, if win deals 12.5 damage to opponents and if
+    lose 15 damage to self
+  - If player B wins, then 
+*/

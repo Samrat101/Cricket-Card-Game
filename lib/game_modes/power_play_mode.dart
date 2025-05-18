@@ -1,38 +1,72 @@
-import 'package:cricket_card_game/comparator.dart';
 import 'package:cricket_card_game/enums.dart';
-import 'package:cricket_card_game/interfaces/card/card_attribute.dart';
+import 'package:cricket_card_game/game_modes/standard_mode.dart';
 import 'package:cricket_card_game/interfaces/game_mode.dart';
 import 'package:cricket_card_game/interfaces/result.dart';
+import 'package:cricket_card_game/player/player_interface.dart';
 
+/// Player can compare two attributes instead of one and wins if they have
+///  the higher value in either attribute, but damage dealt is reduced to 10%
 class PowerPlayMode implements Mode {
   @override
   double get opponentDamage => GameModeType.powerPlay.winDamage;
   @override
   double get activePlayerDamage => GameModeType.powerPlay.lossDamage;
-  final CardAttribute player1A1;
-  final CardAttribute player1A2;
-  final CardAttribute player2A1;
-  final CardAttribute player2A2;
-  PowerPlayMode(this.player1A1, this.player1A2, this.player2A1, this.player2A2);
+  final List<PlayerInterface> players;
+  final CardAttributeType cardAttributeType;
+  final CardAttributeType cardAttributeType2;
+  final PlayerInterface roundLeader;
+  PowerPlayMode({
+    required this.players,
+    required this.cardAttributeType,
+    required this.cardAttributeType2,
+    required this.roundLeader,
+  });
   @override
   Result get result {
-    final firstAttributeResult = player1A1.compare(player2A1);
-    if (firstAttributeResult == ComparisonOutcome.win) {
-      return Result(
-          activePlayerDamage: 0,
-          opponentPlayerDamage: opponentDamage,
-          result: firstAttributeResult);
+    final firstAttributeResult = StandardMode(
+            players: players,
+            cardAttributeType: cardAttributeType,
+            roundLeader: roundLeader)
+        .result;
+    final secondAttributeResult = StandardMode(
+            players: players,
+            cardAttributeType: cardAttributeType2,
+            roundLeader: roundLeader)
+        .result;
+    var tied = false;
+    switch (firstAttributeResult.leaderResult) {
+      case ComparisonOutcome.win:
+        return Result(
+            activePlayerDamage: activePlayerDamage,
+            opponentPlayerDamage: opponentDamage,
+            leaderResult: ComparisonOutcome.win,
+            tiedPlayers: firstAttributeResult.tiedPlayers,
+            winnerPlayer: roundLeader);
+      case ComparisonOutcome.loss:
+        break;
+      case ComparisonOutcome.tie:
+        tied = true;
+        break;
     }
-    final secondAttributeResult = player1A2.compare(player2A2);
-    if (secondAttributeResult == ComparisonOutcome.win) {
-      return Result(
-          activePlayerDamage: activePlayerDamage,
-          opponentPlayerDamage: opponentDamage,
-          result: secondAttributeResult);
+    switch (secondAttributeResult.leaderResult) {
+      case ComparisonOutcome.win:
+        return Result(
+            activePlayerDamage: activePlayerDamage,
+            opponentPlayerDamage: opponentDamage,
+            leaderResult: ComparisonOutcome.win,
+            tiedPlayers: secondAttributeResult.tiedPlayers,
+            winnerPlayer: roundLeader);
+      case ComparisonOutcome.loss:
+        break;
+      case ComparisonOutcome.tie:
+        tied = true;
+        break;
     }
     return Result(
-        activePlayerDamage: 0,
-        opponentPlayerDamage: 0,
-        result: ComparisonOutcome.tie);
+        activePlayerDamage: activePlayerDamage,
+        opponentPlayerDamage: opponentDamage,
+        leaderResult: tied ? ComparisonOutcome.tie : ComparisonOutcome.loss,
+        tiedPlayers: secondAttributeResult.tiedPlayers,
+        winnerPlayer: firstAttributeResult.winnerPlayer);
   }
 }

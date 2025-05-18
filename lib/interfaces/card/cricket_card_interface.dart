@@ -11,6 +11,7 @@ abstract class CricketCardInterface implements CardInterface {
   CardAttribute get catches;
   CardAttribute get wickets;
   String get playerName;
+  String get id;
   @override
   bool get isSelected;
   @override
@@ -25,4 +26,14 @@ abstract class CricketCardInterface implements CardInterface {
   void updateCardSelectedStatus(bool status);
   @override
   CardAttribute getAttribute({required String withValue});
+
+  @override
+  bool operator==(Object other) {
+    if (identical(this, other)) return true;
+    if (other is! CricketCardInterface) return false;
+    return other.id == id;
+  }
+
+  @override
+  int get hashCode => id.hashCode;
 }

@@ -2,17 +2,18 @@ import 'dart:async';
 import 'package:cricket_card_game/interfaces/card/cricket_card_interface.dart';
 import 'package:cricket_card_game/player/player_interface.dart';
 import 'package:cricket_card_game/screens/filp_card.dart';
-import 'package:cricket_card_game/seed_data/seed_data.dart';
 import 'package:flutter/material.dart';
 
 class CardGameScreen extends StatefulWidget {
   final Function onGameStart;
   final List<PlayerInterface> players;
+  final List<CricketCardInterface> cards;
   final Function(CricketCardInterface) cardSeletedCallback;
   const CardGameScreen(
       {super.key,
       required this.onGameStart,
       required this.players,
+      required this.cards,
       required this.cardSeletedCallback});
 
   @override
@@ -39,7 +40,7 @@ class _CardGameScreenState extends State<CardGameScreen> {
 
   void startCardDistributionForPlayers() {
     // Create and shuffle the cards
-    final allCards = DataService().getData()..shuffle();
+    final allCards = widget.cards..shuffle();
 
     // Calculate cards per player
     final players = widget.players;

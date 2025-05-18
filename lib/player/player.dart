@@ -1,11 +1,12 @@
 import 'package:cricket_card_game/enums.dart';
-import 'package:cricket_card_game/interfaces/card/card_attribute.dart';
 import 'package:cricket_card_game/interfaces/card/cricket_card_interface.dart';
 import 'package:cricket_card_game/player/player_interface.dart';
+import 'package:uuid/uuid.dart';
 
 class Player implements PlayerInterface {
   @override
   final String name;
+  final String _id;
   bool _isTurnActive = false;
   double _health = 100;
   List<CricketCardInterface> _cards = [];
@@ -13,9 +14,8 @@ class Player implements PlayerInterface {
   bool _isSpecialModeActive = false;
   bool _didUseSpecialMode = false;
   CricketCardInterface? _currentCard;
-  CardAttribute? _selectedAttribute;
 
-  Player(this.name);
+  Player(this.name) : _id = const Uuid().v4();
   @override
   bool get isTurnActive => _isTurnActive;
   @override
@@ -30,8 +30,6 @@ class Player implements PlayerInterface {
   bool get didUseSpecialMode => _didUseSpecialMode;
   @override
   CricketCardInterface? get currentCard => _currentCard;
-  @override
-  CardAttribute? get selectedAttribute => _selectedAttribute;
 
   @override
   set cards(List<CricketCardInterface> value) {
@@ -73,11 +71,6 @@ class Player implements PlayerInterface {
   }
 
   @override
-  set selectedAttribute(CardAttribute? attribute) {
-    _selectedAttribute = attribute;
-  }
-
-  @override
   void updateHealth(double value) {
     _health = _health + value;
     if (_health < 0) {
@@ -86,4 +79,7 @@ class Player implements PlayerInterface {
       _health = 100;
     }
   }
+
+  @override
+  String get id => _id;
 }

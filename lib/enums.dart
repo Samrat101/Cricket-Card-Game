@@ -87,6 +87,28 @@ enum CardAttributeType {
   const CardAttributeType(this.value);
   final String value;
 
+  String get displayName {
+    return switch (this) {
+      CardAttributeType.catches => 'Catches',
+      CardAttributeType.centuries => 'Centuries',
+      CardAttributeType.halfCenturies => 'Half Centuries',
+      CardAttributeType.matches => 'Matches',
+      CardAttributeType.runs => 'Runs',
+      CardAttributeType.wickets => 'Wickets',
+      CardAttributeType.name => 'Name',
+    };
+  }
+
+  static List<CardAttributeType> get disPlayAttributes {
+    return [
+      CardAttributeType.catches,
+      CardAttributeType.centuries,
+      CardAttributeType.halfCenturies,
+      CardAttributeType.matches,
+      CardAttributeType.runs,
+      CardAttributeType.wickets,
+    ];
+  }
   static CardAttributeType? from(String rawValue) {
     return CardAttributeType.values.cast<CardAttributeType?>().firstWhere(
           (element) => element?.value == rawValue,

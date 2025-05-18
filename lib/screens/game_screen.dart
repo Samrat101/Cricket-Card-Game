@@ -5,6 +5,7 @@ import 'package:cricket_card_game/player/player_interface.dart';
 import 'package:cricket_card_game/screens/cards_screen.dart';
 import 'package:cricket_card_game/screens/mode_selection.dart';
 import 'package:cricket_card_game/screens/player_card.dart';
+import 'package:cricket_card_game/seed_data/seed_data.dart';
 import 'package:flutter/material.dart';
 
 class GameScreen extends StatefulWidget {
@@ -20,6 +21,13 @@ class _GameScreenState extends State<GameScreen> {
   bool canStartGame = false;
   bool gameStarted = false;
   @override
+  void initState() {
+    super.initState();
+    final cards = DataService().getData();
+    game = Game(widget.players, cards);
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Material(
       child: Scaffold(
@@ -32,6 +40,7 @@ class _GameScreenState extends State<GameScreen> {
             ),
             child: Stack(children: [
               CardGameScreen(
+                  cards: game.cards,
                   onGameStart: showModeSelectionDilog,
                   players: widget.players,
                   cardSeletedCallback: cardSeletedCallback),
@@ -104,7 +113,6 @@ class _GameScreenState extends State<GameScreen> {
   }
 
   void startGame() {
-    game = Game(widget.players);
     game.start();
     gameStarted = true;
     setState(() {});
@@ -137,13 +145,6 @@ class _GameScreenState extends State<GameScreen> {
   }
 
   Widget buildAttributeSelector() {
-    List<String> attributes = [
-      'runs',
-      'wickets',
-      'average',
-      'strikeRate',
-      'economyRate',
-    ];
     return Column(
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
@@ -155,14 +156,14 @@ class _GameScreenState extends State<GameScreen> {
               fontWeight: FontWeight.bold,
               color: Colors.black,
             )),
-        ...attributes.map((attribute) => Padding(
+        ...CardAttributeType.disPlayAttributes.map((attribute) => Padding(
               padding: const EdgeInsets.all(12.0),
               child: ElevatedButton(
                 onPressed: () {
-                  game.attributeSelected(attribute);
+                  game.attributeSelected(attribute.value);
                   setState(() {});
                 },
-                child: Text(attribute,
+                child: Text(attribute.displayName,
                     style: const TextStyle(
                       fontSize: 22,
                       fontWeight: FontWeight.bold,
