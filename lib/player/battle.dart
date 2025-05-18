@@ -10,23 +10,25 @@ import 'package:cricket_card_game/player/player.dart';
 //TODO: make health configurable via battle.
 class Game {
   final List<PlayerInterface> players;
-  int currentTurnPlayerIndex = 0;
+  int _currentTurnPlayerIndex = 0;
   CardAttribute? selectedAttribute;
   Game(this.players);
-  PlayerInterface get currentTurnPlayer => players[currentTurnPlayerIndex];
-  PlayerInterface get nextTurnPlayer =>
-      players[nextIndexInRound(afterIndex: currentTurnPlayerIndex)];
+  PlayerInterface get currentTurnPlayer => players[_currentTurnPlayerIndex];
+  PlayerInterface get _nextTurnPlayer =>
+      players[nextIndexInRound(afterIndex: _currentTurnPlayerIndex)];
   (PlayerInterface player, int index)? currentRoundLeader;
-  (PlayerInterface player, int index) get nextRoundLeader => (
-        players[nextIndexInRound(afterIndex: currentRoundLeader!.$2)],
-        nextIndexInRound(afterIndex: currentRoundLeader!.$2)
-      );
+  (PlayerInterface player, int index) get _nextRoundLeader {
+    final nextRoundLeaderIndex =
+        nextIndexInRound(afterIndex: currentRoundLeader!.$2);
+    return (players[nextRoundLeaderIndex], nextRoundLeaderIndex);
+  }
+
   void start() {
-    players[currentTurnPlayerIndex].isTurnActive = true;
-    players[currentTurnPlayerIndex].isTurnActive = true;
+    players[_currentTurnPlayerIndex].isTurnActive = true;
+    players[_currentTurnPlayerIndex].isTurnActive = true;
     currentRoundLeader =
-        (players[currentTurnPlayerIndex], currentTurnPlayerIndex);
-    for (var element in players[currentTurnPlayerIndex].cards) {
+        (players[_currentTurnPlayerIndex], _currentTurnPlayerIndex);
+    for (var element in players[_currentTurnPlayerIndex].cards) {
       element.canSelect = true;
     }
   }
@@ -43,27 +45,27 @@ class Game {
       }
     }
 
-    for (var element in nextRoundLeader.$1.cards) {
+    for (var element in _nextRoundLeader.$1.cards) {
       element.canSelect = true;
     }
 
     currentTurnPlayer.isTurnActive = false;
-    currentTurnPlayerIndex = nextRoundLeader.$2;
+    _currentTurnPlayerIndex = _nextRoundLeader.$2;
     currentTurnPlayer.isTurnActive = true;
     currentRoundLeader =
-        (players[currentTurnPlayerIndex], currentTurnPlayerIndex);
+        (players[_currentTurnPlayerIndex], _currentTurnPlayerIndex);
   }
 
   void moveTurnToNextPlayer() {
-    for (var element in nextTurnPlayer.cards) {
+    for (var element in _nextTurnPlayer.cards) {
       element.canSelect = true;
     }
     for (var element in currentTurnPlayer.cards) {
       element.canSelect = false;
     }
     currentTurnPlayer.isTurnActive = false;
-    currentTurnPlayerIndex =
-        nextIndexInRound(afterIndex: currentTurnPlayerIndex);
+    _currentTurnPlayerIndex =
+        nextIndexInRound(afterIndex: _currentTurnPlayerIndex);
     currentTurnPlayer.isTurnActive = true;
   }
 
