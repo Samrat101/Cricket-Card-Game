@@ -1,6 +1,6 @@
 import 'package:cricket_card_game/interfaces/result.dart';
 
-abstract class Mode {
+abstract class GameLevelMode {
   /// this is the damage dealt to opponents, if the active
   /// player wins the comparison.
   double get opponentDamage;
@@ -10,4 +10,10 @@ abstract class Mode {
   double get activePlayerDamage;
 
   Result get result;
+}
+
+abstract class BattleLevelMode {
+  double get opponentDamage;
+  double get activePlayerDamage;
+  BattleLevelModeResult get result;
 }

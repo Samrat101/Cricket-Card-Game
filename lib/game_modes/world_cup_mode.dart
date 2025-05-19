@@ -1,24 +1,28 @@
 import 'package:cricket_card_game/enums.dart';
 import 'package:cricket_card_game/game_modes/standard_mode.dart';
+import 'package:cricket_card_game/interfaces/card/cricket_card_interface.dart';
 import 'package:cricket_card_game/interfaces/game_mode.dart';
 import 'package:cricket_card_game/interfaces/result.dart';
 
 /// Player's final card deals double damage if they win the comparison
-class WorldCupMode extends StandardMode implements Mode {
+class WorldCupMode extends StandardMode implements GameLevelMode {
   @override
   double get activePlayerDamage => GameModeType.standard.winDamage;
   @override
   double get opponentDamage => GameModeType.standard.lossDamage;
-  bool isLastCardForActivePlayer;
+  final bool _isLastCardForActivePlayer;
+  final CricketCardInterface _roundLeaderCard;
   WorldCupMode(
-      {required super.players,
-      required super.roundLeader,
+      {required super.cards,
+      required super.roundLeaderCard,
       required super.cardAttributeType,
-      required this.isLastCardForActivePlayer});
+      required bool isLastCardForActivePlayer})
+      : _isLastCardForActivePlayer = isLastCardForActivePlayer,
+        _roundLeaderCard = roundLeaderCard;
   @override
   Result get result {
     final comparisionResult = super.result;
-    if (!isLastCardForActivePlayer) {
+    if (!_isLastCardForActivePlayer) {
       return comparisionResult;
     }
     if (comparisionResult.leaderResult == ComparisonOutcome.win) {
@@ -26,8 +30,8 @@ class WorldCupMode extends StandardMode implements Mode {
           activePlayerDamage: activePlayerDamage,
           opponentPlayerDamage: opponentDamage * 2,
           leaderResult: ComparisonOutcome.win,
-          tiedPlayers: [],
-          winnerPlayer: roundLeader);
+          tiedCards: [],
+          winnerCard: _roundLeaderCard);
     }
     return comparisionResult;
   }

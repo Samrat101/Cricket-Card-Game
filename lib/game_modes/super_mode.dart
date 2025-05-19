@@ -6,18 +6,14 @@ import 'package:cricket_card_game/player/player_interface.dart';
 
 /// If the player has both the highest runs card and highest
 /// wickets card in their hand, they deal 25 damage per win
-class SuperMode implements Mode {
+class SuperMode implements BattleLevelMode {
   @override
   double get opponentDamage => GameModeType.superr.winDamage;
   @override
   double get activePlayerDamage => GameModeType.superr.lossDamage;
   List<PlayerInterface> players;
   PlayerInterface roundLeader;
-  List<CricketCardInterface> gameCards;
-  SuperMode(
-      {required this.players,
-      required this.roundLeader,
-      required this.gameCards});
+  SuperMode({required this.players, required this.roundLeader});
 
   // Helper method to find the card with highest runs in a list
   CricketCardInterface _findHighestRunsCard(List<CricketCardInterface> cards) {
@@ -40,16 +36,20 @@ class SuperMode implements Mode {
     }
 
     return cards.reduce((highest, current) {
-      final currentRuns = current.runs.value as num;
-      final highestRuns = highest.runs.value as num;
-      return currentRuns > highestRuns ? current : highest;
+      final currentWickets = current.wickets.value as num;
+      final highestWickets = highest.wickets.value as num;
+      return currentWickets > highestWickets ? current : highest;
     });
   }
 
   @override
-  Result get result {
-    final highestRunsCard = _findHighestRunsCard(gameCards);
-    final highestWicketsCard = _findHighestWicketsCard(gameCards);
+  BattleLevelModeResult get result {
+    final allCards = <CricketCardInterface>[];
+    for (var player in players) {
+      allCards.addAll(player.cards);
+    }
+    final highestRunsCard = _findHighestRunsCard(allCards);
+    final highestWicketsCard = _findHighestWicketsCard(allCards);
     final playerWithHighestRuns = players.firstWhere((player) {
       return player.cards.contains(highestRunsCard);
     });
@@ -58,28 +58,25 @@ class SuperMode implements Mode {
     });
     if (playerWithHighestRuns == playerWithHighestWickets) {
       if (playerWithHighestRuns == roundLeader) {
-        return Result(
+        return BattleLevelModeResult(
             activePlayerDamage: activePlayerDamage,
             opponentPlayerDamage: opponentDamage,
             leaderResult: ComparisonOutcome.win,
-            tiedPlayers: [],
-            winnerPlayer: roundLeader);
+            winnerPlayer: playerWithHighestRuns);
       } else {
-        return Result(
+        return BattleLevelModeResult(
             activePlayerDamage: activePlayerDamage,
             opponentPlayerDamage: opponentDamage,
             leaderResult: ComparisonOutcome.loss,
-            tiedPlayers: [],
             winnerPlayer: playerWithHighestRuns);
       }
     } else {
       // no single player has both highest runs and highest wickets
       // so no damage for any player
-      return Result(
+      return BattleLevelModeResult(
           activePlayerDamage: activePlayerDamage,
           opponentPlayerDamage: opponentDamage,
           leaderResult: ComparisonOutcome.tie,
-          tiedPlayers: players,
           winnerPlayer: null);
     }
   }
