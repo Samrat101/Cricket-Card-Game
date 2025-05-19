@@ -25,7 +25,7 @@ class Game {
       player.updateHealth(_initialHealthForPlayers);
     }
   }
-  
+
   (PlayerInterface player, int index)? get currentRoundLeader =>
       _currentRoundLeader;
   PlayerInterface get currentTurnPlayer => players[_currentTurnPlayerIndex];
@@ -94,7 +94,7 @@ class Game {
   }
 
   void _updateSelectedCard(CricketCardInterface card) {
-    currentTurnPlayer.currentCard = card;
+    currentTurnPlayer.currentCard = card.isSelected ? card : null;
   }
 
   void cardSelectedCallback(CricketCardInterface card) {
