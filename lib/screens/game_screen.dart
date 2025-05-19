@@ -20,6 +20,7 @@ class _GameScreenState extends State<GameScreen> {
   late Game game;
   bool canStartGame = false;
   bool gameStarted = false;
+  List<PlayerInterface>? winnerPlayers;
   @override
   void initState() {
     super.initState();
@@ -95,7 +96,12 @@ class _GameScreenState extends State<GameScreen> {
                           ? buildAttributeSelector()
                           : Center(
                               child: Text(
-                                '${game.currentTurnPlayer.name} Please Select A Card',
+                                (winnerPlayers != null &&
+                                        winnerPlayers!.isEmpty)
+                                    ? '${game.currentTurnPlayer.name} Please Select A Card'
+                                    : (winnerPlayers?.length == 1
+                                        ? '${winnerPlayers?.first.name} is the winner'
+                                        : 'Match Draw'),
                                 textAlign: TextAlign.center,
                                 style: const TextStyle(
                                   fontSize: 32,
@@ -121,6 +127,7 @@ class _GameScreenState extends State<GameScreen> {
   void cardSeletedCallback(CricketCardInterface card) {
     game.cardSelectedCallback(card);
     setState(() {});
+    winnerPlayers = game.isGameOver();
   }
 
   void showModeSelectionDilog() async {
