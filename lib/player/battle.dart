@@ -1,3 +1,5 @@
+// ignore_for_file: unnecessary_getters_setters
+
 import 'package:cricket_card_game/enums.dart';
 import 'package:cricket_card_game/game_modes/free_hit_mode.dart';
 import 'package:cricket_card_game/game_modes/power_play_mode.dart';
@@ -9,22 +11,34 @@ import 'package:cricket_card_game/interfaces/game_mode.dart';
 import 'package:cricket_card_game/interfaces/result.dart';
 import 'package:cricket_card_game/player/player_interface.dart';
 
-//TODO: make health configurable via battle.
 class Game {
   final List<PlayerInterface> players;
   final List<CricketCardInterface> cards;
-  int _currentTurnPlayerIndex = 0;
+  final double _initialHealthForPlayers = 1000;
+  (PlayerInterface player, int index)? _currentRoundLeader;
   CardAttributeType? selectedAttribute;
-  Game(this.players, this.cards);
+  int _currentTurnPlayerIndex = 0;
 
+  Game(this.players, this.cards) {
+    for (var player in players) {
+      player.maxHealth = _initialHealthForPlayers;
+      player.updateHealth(_initialHealthForPlayers);
+    }
+  }
+  
+  (PlayerInterface player, int index)? get currentRoundLeader =>
+      _currentRoundLeader;
   PlayerInterface get currentTurnPlayer => players[_currentTurnPlayerIndex];
   PlayerInterface get _nextTurnPlayer =>
       players[_nextIndexInRound(afterIndex: _currentTurnPlayerIndex)];
-  (PlayerInterface player, int index)? currentRoundLeader;
   (PlayerInterface player, int index) get _nextRoundLeader {
     final nextRoundLeaderIndex =
         _nextIndexInRound(afterIndex: currentRoundLeader!.$2);
     return (players[nextRoundLeaderIndex], nextRoundLeaderIndex);
+  }
+
+  set currentRoundLeader((PlayerInterface player, int index)? value) {
+    _currentRoundLeader = value;
   }
 
   void start() {

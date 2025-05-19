@@ -14,6 +14,7 @@ class Player implements PlayerInterface {
   bool _isSpecialModeActive = false;
   bool _didUseSpecialMode = false;
   CricketCardInterface? _currentCard;
+  double _maxHealth = 100;
 
   Player(this.name) : _id = const Uuid().v4();
   @override
@@ -30,6 +31,8 @@ class Player implements PlayerInterface {
   bool get didUseSpecialMode => _didUseSpecialMode;
   @override
   CricketCardInterface? get currentCard => _currentCard;
+  @override
+  double get maxHealth => _maxHealth;
 
   @override
   set cards(List<CricketCardInterface> value) {
@@ -71,12 +74,17 @@ class Player implements PlayerInterface {
   }
 
   @override
+  set maxHealth(double value) {
+    _maxHealth = value;
+  }
+
+  @override
   void updateHealth(double value) {
     _health = _health + value;
     if (_health < 0) {
       _health = 0;
-    } else if (_health > 100) {
-      _health = 100;
+    } else if (_health > _maxHealth) {
+      _health = _maxHealth;
     }
   }
 

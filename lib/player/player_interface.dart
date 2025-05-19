@@ -11,6 +11,7 @@ abstract class PlayerInterface {
   bool get isSpecialModeActive;
   bool get didUseSpecialMode;
   CricketCardInterface? get currentCard;
+  double get maxHealth;
 
   set cards(List<CricketCardInterface> cards);
   set specialMode(GameModeType? mode);
@@ -18,6 +19,7 @@ abstract class PlayerInterface {
   set didUseSpecialMode(bool value);
   set currentCard(CricketCardInterface? card);
   set isTurnActive(bool value);
+  set maxHealth(double value);
   void updateHealth(double value);
   void toggleSpecialMode();
 
