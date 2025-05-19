@@ -97,6 +97,37 @@ class Game {
     currentTurnPlayer.currentCard = card.isSelected ? card : null;
   }
 
+  List<PlayerInterface>? isGameOver() {
+    List<PlayerInterface> winners = [];
+    for (var player in players) {
+      if (player.health <= 0) {
+        print('${player.name} is out of the game');
+        players.remove(player);
+      }
+    }
+    if (currentRoundLeader?.$1.cards.cast<CricketCardInterface?>().firstWhere(
+              (element) => element?.isDiscarded == false,
+              orElse: () => null,
+            ) ==
+        null) {
+      PlayerInterface winnerPlayer = players.first;
+      for (var player in players) {
+        if (player.health > winnerPlayer.health) {
+          winners = [];
+          winners.add(player);
+        } else if (player.health == winnerPlayer.health) {
+          winners.add(player);
+        }
+      }
+      return winners;
+    }
+    if (players.length == 1) {
+      print('${players.first.name} is the winner');
+      winners.add(players.first);
+    }
+    return winners;
+  }
+
   void cardSelectedCallback(CricketCardInterface card) {
     _updateSelectedCard(card);
     if (_didAllPlayersSelectedCards()) {
