@@ -18,3 +18,7 @@ class CricketCardGameApp extends StatelessWidget {
     );
   }
 }
+
+// Create UI for winner.
+// Create UI for multiple inputs. (Check on mode selection)
+// Card select deselect UI. error case.

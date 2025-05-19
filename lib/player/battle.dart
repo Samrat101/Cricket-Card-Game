@@ -80,7 +80,7 @@ class Game {
   }
 
   void _updateSelectedCard(CricketCardInterface card) {
-    currentTurnPlayer.currentCard = card;
+    currentTurnPlayer.currentCard = card.isSelected ? card : null;
   }
 
   void cardSelectedCallback(CricketCardInterface card) {
@@ -163,9 +163,7 @@ class Game {
             cardAttributeType2: attributeToCompare);
       case GameModeType.superr:
         return SuperMode(
-            players: players,
-            roundLeader: roundLeader,
-            gameCards: cards);
+            players: players, roundLeader: roundLeader, gameCards: cards);
       case GameModeType.freeHit:
         return FreeHitMode(
             players: players,
