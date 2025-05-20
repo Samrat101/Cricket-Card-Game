@@ -209,10 +209,11 @@ class Game {
           _handleDeckLevelMode(activeMode, roundLeader.$1);
           return;
         }
-        final RoundLevelMode modeObject =
-            _createModeObject(activeMode, roundLeader.$1, attributeToCompare);
+        final RoundLevelMode modeObject = _createRoundLevelModeObject(
+            activeMode, roundLeader.$1, attributeToCompare);
         final result = modeObject.result;
         _calculateAndupdatePlayerHealth(activeMode, result, roundLeader.$1);
+        _updateSpecialModeState(activeMode);
       }
     }
   }
@@ -259,7 +260,7 @@ class Game {
     return list;
   }
 
-  RoundLevelMode _createModeObject(GameModeType gamMode,
+  RoundLevelMode _createRoundLevelModeObject(GameModeType gamMode,
       PlayerInterface roundLeader, List<CardAttributeType> attributeToCompare) {
     switch (gamMode) {
       case GameModeType.standard:

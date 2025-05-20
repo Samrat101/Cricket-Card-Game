@@ -63,11 +63,11 @@ class StandardMode implements RoundLevelMode {
 
     final winnerValue =
         winnerCard.getAttribute(withValue: _cardAttributeType.value).value;
-    return cards
-        .where((card) =>
-            card.getAttribute(withValue: _cardAttributeType.value).value ==
-            winnerValue)
-        .toList();
+    return cards.where((card) {
+      return card != winnerCard &&
+          card.getAttribute(withValue: _cardAttributeType.value).value ==
+              winnerValue;
+    }).toList();
   }
 
   /// Determines the comparison outcome for the round leader
