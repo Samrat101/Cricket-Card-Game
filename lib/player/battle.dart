@@ -13,7 +13,7 @@ class Game {
   final List<PlayerInterface> players;
   final List<CricketCardInterface> cards;
   int _currentTurnPlayerIndex = 0;
-  CardAttributeType? selectedAttribute;
+  List<CardAttributeType>? selectedAttribute = [];
   Game(this.players, this.cards);
 
   PlayerInterface get currentTurnPlayer => players[_currentTurnPlayerIndex];
@@ -37,7 +37,7 @@ class Game {
   }
 
   void _moveToNextRound() {
-    selectedAttribute = null;
+    selectedAttribute = [];
     for (var player in players) {
       for (var element in player.cards) {
         if (element.isSelected) {
@@ -113,6 +113,17 @@ class Game {
     return winners;
   }
 
+  bool askForSecondAttribute() {
+    if (currentRoundLeader?.$1.isSpecialModeActive == true) {
+      if (currentRoundLeader?.$1.specialMode == GameModeType.powerPlay) {
+        if (selectedAttribute?.length == 1) {
+          return true;
+        }
+      }
+    }
+    return false;
+  }
+
   void cardSelectedCallback(CricketCardInterface card) {
     _updateSelectedCard(card);
     if (_didAllPlayersSelectedCards()) {
@@ -126,7 +137,7 @@ class Game {
         element.updateCardSelectedStatus(false);
       }
     }
-    if (selectedAttribute != null) {
+    if (selectedAttribute?.isNotEmpty ?? true) {
       _moveTurnToNextPlayer();
     }
   }
@@ -178,19 +189,19 @@ class Game {
   }
 
   Mode _createModeObject(GameModeType gamMode, PlayerInterface roundLeader,
-      CardAttributeType attributeToCompare) {
+      List<CardAttributeType> attributeToCompare) {
     switch (gamMode) {
       case GameModeType.standard:
         return StandardMode(
             players: players,
             roundLeader: roundLeader,
-            cardAttributeType: attributeToCompare);
+            cardAttributeType: attributeToCompare.first);
       case GameModeType.powerPlay:
         return PowerPlayMode(
             players: players,
             roundLeader: roundLeader,
-            cardAttributeType: attributeToCompare,
-            cardAttributeType2: attributeToCompare);
+            cardAttributeType: attributeToCompare.first,
+            cardAttributeType2: attributeToCompare.last);
       case GameModeType.superr:
         return SuperMode(
             players: players, roundLeader: roundLeader, gameCards: cards);
@@ -198,14 +209,14 @@ class Game {
         return FreeHitMode(
             players: players,
             roundLeader: roundLeader,
-            cardAttributeType: attributeToCompare);
+            cardAttributeType: attributeToCompare.first);
       case GameModeType.worldCup:
         final isLastCardForActivePlayer =
             roundLeader.cards.where((e) => !e.isDiscarded).length == 1;
         return WorldCupMode(
             players: players,
             roundLeader: roundLeader,
-            cardAttributeType: attributeToCompare,
+            cardAttributeType: attributeToCompare.first,
             isLastCardForActivePlayer: isLastCardForActivePlayer);
     }
   }
@@ -304,9 +315,12 @@ class Game {
   void attributeSelected(String attribute) {
     final attributeType = CardAttributeType.from(attribute);
     if (attributeType != null) {
-      selectedAttribute = attributeType;
+      selectedAttribute?.add(attributeType);
     }
     if (currentRoundLeader == null) {
+      return;
+    }
+    if (askForSecondAttribute()) {
       return;
     }
     _moveTurnToNextPlayer();
