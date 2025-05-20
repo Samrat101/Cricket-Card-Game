@@ -5,7 +5,7 @@ import 'package:cricket_card_game/interfaces/game_mode.dart';
 import 'package:cricket_card_game/interfaces/result.dart';
 
 /// Player's final card deals double damage if they win the comparison
-class WorldCupMode extends StandardMode implements GameLevelMode {
+class WorldCupMode extends StandardMode implements RoundLevelMode {
   @override
   double get activePlayerDamage => GameModeType.standard.winDamage;
   @override

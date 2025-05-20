@@ -4,7 +4,7 @@ import 'package:cricket_card_game/interfaces/card/cricket_card_interface.dart';
 import 'package:cricket_card_game/interfaces/game_mode.dart';
 import 'package:cricket_card_game/interfaces/result.dart';
 
-class StandardMode implements GameLevelMode {
+class StandardMode implements RoundLevelMode {
   @override
   double get opponentDamage => GameModeType.standard.winDamage;
   @override

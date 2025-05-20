@@ -6,7 +6,7 @@ import 'package:cricket_card_game/interfaces/result.dart';
 
 /// Player can compare two attributes instead of one and wins if they have
 ///  the higher value in either attribute, but damage dealt is reduced to 10%
-class PowerPlayMode implements GameLevelMode {
+class PowerPlayMode implements RoundLevelMode {
   @override
   double get opponentDamage => GameModeType.powerPlay.winDamage;
   @override

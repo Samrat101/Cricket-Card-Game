@@ -198,7 +198,7 @@ class Game {
           _handleBattleLevelMode(activeMode, roundLeader.$1);
           return;
         }
-        final GameLevelMode modeObject =
+        final RoundLevelMode modeObject =
             _createModeObject(activeMode, roundLeader.$1, attributeToCompare);
         final result = modeObject.result;
         _calculateAndupdatePlayerHealth(activeMode, result, roundLeader.$1);
@@ -210,7 +210,7 @@ class Game {
   /// because it has different logic
   void _handleBattleLevelMode(
       GameModeType activeMode, PlayerInterface roundLeader) {
-    final BattleLevelMode object;
+    final DeckLevelMode object;
     switch (activeMode) {
       case GameModeType.superr:
         object = SuperMode(players: players, roundLeader: roundLeader);
@@ -248,7 +248,7 @@ class Game {
     return list;
   }
 
-  GameLevelMode _createModeObject(GameModeType gamMode,
+  RoundLevelMode _createModeObject(GameModeType gamMode,
       PlayerInterface roundLeader, CardAttributeType attributeToCompare) {
     switch (gamMode) {
       case GameModeType.standard:

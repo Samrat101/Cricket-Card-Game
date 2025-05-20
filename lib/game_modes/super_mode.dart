@@ -6,7 +6,7 @@ import 'package:cricket_card_game/player/player_interface.dart';
 
 /// If the player has both the highest runs card and highest
 /// wickets card in their hand, they deal 25 damage per win
-class SuperMode implements BattleLevelMode {
+class SuperMode implements DeckLevelMode {
   @override
   double get opponentDamage => GameModeType.superr.winDamage;
   @override
@@ -43,7 +43,7 @@ class SuperMode implements BattleLevelMode {
   }
 
   @override
-  BattleLevelModeResult get result {
+  DeckLevelResult get result {
     final allCards = <CricketCardInterface>[];
     for (var player in players) {
       allCards.addAll(player.cards);
@@ -58,13 +58,13 @@ class SuperMode implements BattleLevelMode {
     });
     if (playerWithHighestRuns == playerWithHighestWickets) {
       if (playerWithHighestRuns == roundLeader) {
-        return BattleLevelModeResult(
+        return DeckLevelResult(
             activePlayerDamage: activePlayerDamage,
             opponentPlayerDamage: opponentDamage,
             leaderResult: ComparisonOutcome.win,
             winnerPlayer: playerWithHighestRuns);
       } else {
-        return BattleLevelModeResult(
+        return DeckLevelResult(
             activePlayerDamage: activePlayerDamage,
             opponentPlayerDamage: opponentDamage,
             leaderResult: ComparisonOutcome.loss,
@@ -73,7 +73,7 @@ class SuperMode implements BattleLevelMode {
     } else {
       // no single player has both highest runs and highest wickets
       // so no damage for any player
-      return BattleLevelModeResult(
+      return DeckLevelResult(
           activePlayerDamage: activePlayerDamage,
           opponentPlayerDamage: opponentDamage,
           leaderResult: ComparisonOutcome.tie,
