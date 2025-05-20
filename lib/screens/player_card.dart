@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 
 class PlayerCard extends StatefulWidget {
   final PlayerInterface player;
-  final bool Function() didChangeSpecialModeState;
+  final bool Function(PlayerInterface player) didChangeSpecialModeState;
   const PlayerCard(
       {super.key,
       required this.player,
@@ -38,7 +38,7 @@ class _PlayerCardState extends State<PlayerCard> {
                   const SizedBox(width: 12),
                   InkWell(
                     onTap: () {
-                      final canChange = widget.didChangeSpecialModeState();
+                      final canChange = widget.didChangeSpecialModeState(widget.player);
                       if (canChange) {
                         setState(() {});
                       } else {

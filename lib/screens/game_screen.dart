@@ -52,15 +52,8 @@ class _GameScreenState extends State<GameScreen> {
                     children: widget.players
                         .map((player) => PlayerCard(
                             player: player,
-                            didChangeSpecialModeState: () {
-                              final canChange =
-                                  game.canChangeSpecialMode(player: player);
-                              if (canChange) {
-                                player.toggleSpecialMode();
-                                return true;
-                              }
-                              return false;
-                            }))
+                            didChangeSpecialModeState:
+                                _didChangeSpecialModeState))
                         .toList(),
                   ),
                   if (canStartGame && !gameStarted)
@@ -180,5 +173,19 @@ class _GameScreenState extends State<GameScreen> {
             )),
       ],
     );
+  }
+
+  bool _didChangeSpecialModeState(PlayerInterface player) {
+    final canChange = game.canChangeSpecialMode(player: player);
+    if (canChange) {
+      game.activateSpecialMode(player: player);
+      if (player.specialMode?.isBattleLevelMode == true) {
+        Future.delayed(Duration.zero, () {
+          setState(() {});
+        });
+      }
+      return true;
+    }
+    return false;
   }
 }

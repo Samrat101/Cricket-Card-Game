@@ -14,7 +14,7 @@ import 'package:cricket_card_game/player/player_interface.dart';
 class Game {
   final List<PlayerInterface> players;
   final List<CricketCardInterface> cards;
-  final double _initialHealthForPlayers = 1000;
+  final double _initialHealthForPlayers = 100;
   (PlayerInterface player, int index)? _currentRoundLeader;
   CardAttributeType? selectedAttribute;
   int _currentTurnPlayerIndex = 0;
@@ -174,6 +174,17 @@ class Game {
       }
     }
     return true;
+  }
+
+  void activateSpecialMode({required PlayerInterface player}) {
+    player.toggleSpecialMode();
+    if (player == currentRoundLeader?.$1 && player.isSpecialModeActive) {
+      final mode = player.specialMode;
+      if (mode != null && mode.isBattleLevelMode) {
+        _handleBattleLevelMode(mode, player);
+        _moveToNextRound();
+      }
+    }
   }
 
   void _compareCards() {
