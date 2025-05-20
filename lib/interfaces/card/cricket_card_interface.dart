@@ -24,11 +24,10 @@ abstract class CricketCardInterface implements CardInterface {
   set isDiscarded(bool value);
   @override
   void updateCardSelectedStatus(bool status);
-  @override
   CardAttribute getAttribute({required String withValue});
 
   @override
-  bool operator==(Object other) {
+  bool operator ==(Object other) {
     if (identical(this, other)) return true;
     if (other is! CricketCardInterface) return false;
     return other.id == id;

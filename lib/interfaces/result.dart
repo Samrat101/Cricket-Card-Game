@@ -2,13 +2,13 @@ import 'package:cricket_card_game/enums.dart';
 import 'package:cricket_card_game/interfaces/card/cricket_card_interface.dart';
 import 'package:cricket_card_game/player/player_interface.dart';
 
-class Result {
+class RoundLevelResult {
   final double activePlayerDamage;
   final double opponentPlayerDamage;
   final ComparisonOutcome leaderResult;
   final List<CricketCardInterface> tiedCards;
   final CricketCardInterface? winnerCard;
-  Result({
+  RoundLevelResult({
     required this.activePlayerDamage,
     required this.opponentPlayerDamage,
     required this.leaderResult,

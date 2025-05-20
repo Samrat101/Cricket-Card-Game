@@ -280,8 +280,8 @@ class Game {
     }
   }
 
-  void _calculateAndupdatePlayerHealth(
-      GameModeType gamMode, Result result, PlayerInterface roundLeader) {
+  void _calculateAndupdatePlayerHealth(GameModeType gamMode,
+      RoundLevelResult result, PlayerInterface roundLeader) {
     switch (gamMode) {
       case GameModeType.standard:
         _updatePlayersHealth(result);
@@ -318,7 +318,7 @@ class Game {
     }
   }
 
-  void _updatePlayersHealth(Result result) {
+  void _updatePlayersHealth(RoundLevelResult result) {
     if (result.leaderResult == ComparisonOutcome.win) {
       _updatePlayersHealthForLeaderDamage(players, result);
     } else if (result.tiedCards.isNotEmpty) {
@@ -333,7 +333,7 @@ class Game {
   /// since leader got lost in free hit mode, he deals
   /// additional damage compared to other losers.
   void _updateHealthForNonLeaderPlayers(
-      PlayerInterface roundLeader, Result result) {
+      PlayerInterface roundLeader, RoundLevelResult result) {
     roundLeader.updateHealth(-result.activePlayerDamage);
     final playersOtherThanLeader = players.where((e) => e != roundLeader);
     _updatePlayersHealthForNonLeaderDamage(playersOtherThanLeader, result);
@@ -342,7 +342,7 @@ class Game {
   /// updates all players who are not winner
   /// with -{Result.opponentPlayerDamage}
   void _updatePlayersHealthForLeaderDamage(
-      Iterable<PlayerInterface> players, Result result) {
+      Iterable<PlayerInterface> players, RoundLevelResult result) {
     for (var player in players) {
       if (player.currentCard?.id != result.winnerCard?.id) {
         player.updateHealth(-result.opponentPlayerDamage);
@@ -353,7 +353,7 @@ class Game {
   /// updates all players who are not winner
   /// with -{Result.opponentPlayerDamage}
   void _updatePlayersHealthForNonLeaderDamage(
-      Iterable<PlayerInterface> players, Result result) {
+      Iterable<PlayerInterface> players, RoundLevelResult result) {
     for (var player in players) {
       if (player.currentCard?.id != result.winnerCard?.id) {
         player.updateHealth(-GameModeType.standard.lossDamage);

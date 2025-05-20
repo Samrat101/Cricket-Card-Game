@@ -1,4 +1,3 @@
-import 'package:cricket_card_game/interfaces/card/card_attribute.dart';
 
 abstract class CardInterface {
   bool get isSelected;
@@ -7,5 +6,4 @@ abstract class CardInterface {
   set canSelect(bool value);
   set isDiscarded(bool value);
   void updateCardSelectedStatus(bool status);
-  CardAttribute getAttribute({required String withValue});
 }

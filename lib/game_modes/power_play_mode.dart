@@ -26,12 +26,12 @@ class PowerPlayMode implements GameLevelMode {
         _cardAttributeType2 = cardAttributeType2;
 
   @override
-  Result get result {
+  RoundLevelResult get result {
     final firstResult = _getAttributeResult(_cardAttributeType);
     var firstComparisionTied = false;
     switch (firstResult.leaderResult) {
       case ComparisonOutcome.win:
-        return Result(
+        return RoundLevelResult(
           activePlayerDamage: activePlayerDamage,
           opponentPlayerDamage: opponentDamage,
           leaderResult: ComparisonOutcome.win,
@@ -46,7 +46,7 @@ class PowerPlayMode implements GameLevelMode {
     final secondResult = _getAttributeResult(_cardAttributeType2);
     switch (secondResult.leaderResult) {
       case ComparisonOutcome.win:
-        return Result(
+        return RoundLevelResult(
           activePlayerDamage: activePlayerDamage,
           opponentPlayerDamage: opponentDamage,
           leaderResult: ComparisonOutcome.win,
@@ -54,7 +54,7 @@ class PowerPlayMode implements GameLevelMode {
           winnerCard: secondResult.winnerCard,
         );
       case ComparisonOutcome.tie:
-        return Result(
+        return RoundLevelResult(
           activePlayerDamage: activePlayerDamage,
           opponentPlayerDamage: opponentDamage,
           leaderResult: ComparisonOutcome.tie,
@@ -63,7 +63,7 @@ class PowerPlayMode implements GameLevelMode {
         );
       case ComparisonOutcome.loss:
         if (firstComparisionTied) {
-          return Result(
+          return RoundLevelResult(
             activePlayerDamage: activePlayerDamage,
             opponentPlayerDamage: opponentDamage,
             leaderResult: ComparisonOutcome.tie,
@@ -76,7 +76,7 @@ class PowerPlayMode implements GameLevelMode {
         break;
     }
 
-    return Result(
+    return RoundLevelResult(
       activePlayerDamage: activePlayerDamage,
       opponentPlayerDamage: opponentDamage,
       leaderResult: ComparisonOutcome.loss,
@@ -85,7 +85,7 @@ class PowerPlayMode implements GameLevelMode {
     );
   }
 
-  Result _getAttributeResult(CardAttributeType attributeType) {
+  RoundLevelResult _getAttributeResult(CardAttributeType attributeType) {
     return StandardMode(
       cards: _cards,
       cardAttributeType: attributeType,

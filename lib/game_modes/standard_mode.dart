@@ -21,10 +21,10 @@ class StandardMode implements GameLevelMode {
         _cardAttributeType = cardAttributeType;
 
   @override
-  Result get result {
+  RoundLevelResult get result {
     final winnerCard = _determineWinnerCard(_cards);
     final tiedCards = _handleTies(_cards, winnerCard);
-    return Result(
+    return RoundLevelResult(
       activePlayerDamage: activePlayerDamage,
       opponentPlayerDamage: opponentDamage,
       leaderResult: _getLeaderResult(tiedCards, _roundLeaderCard, winnerCard),

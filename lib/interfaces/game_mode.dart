@@ -9,7 +9,7 @@ abstract class GameLevelMode {
   /// opponent wins the comparison.
   double get activePlayerDamage;
 
-  Result get result;
+  RoundLevelResult get result;
 }
 
 abstract class BattleLevelMode {

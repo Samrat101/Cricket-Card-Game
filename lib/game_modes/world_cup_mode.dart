@@ -20,13 +20,13 @@ class WorldCupMode extends StandardMode implements GameLevelMode {
       : _isLastCardForActivePlayer = isLastCardForActivePlayer,
         _roundLeaderCard = roundLeaderCard;
   @override
-  Result get result {
+  RoundLevelResult get result {
     final comparisionResult = super.result;
     if (!_isLastCardForActivePlayer) {
       return comparisionResult;
     }
     if (comparisionResult.leaderResult == ComparisonOutcome.win) {
-      return Result(
+      return RoundLevelResult(
           activePlayerDamage: activePlayerDamage,
           opponentPlayerDamage: opponentDamage * 2,
           leaderResult: ComparisonOutcome.win,
