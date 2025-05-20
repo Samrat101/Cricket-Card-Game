@@ -183,7 +183,7 @@ class _GameScreenState extends State<GameScreen> {
     final canChange = game.canChangeSpecialMode(player: player);
     if (canChange) {
       game.activateSpecialMode(player: player);
-      if (player.specialMode?.isBattleLevelMode == true) {
+      if (player.specialMode?.isDeckLevelMode == true) {
         Future.delayed(Duration.zero, () {
           setState(() {});
         });

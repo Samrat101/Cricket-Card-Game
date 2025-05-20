@@ -75,7 +75,7 @@ enum GameModeType {
     };
   }
 
-  bool get isBattleLevelMode {
+  bool get isDeckLevelMode {
     return this == GameModeType.superr;
   }
 }
