@@ -183,8 +183,8 @@ class Game {
             ? roundLeader.$1.specialMode
             : null;
         activeMode ??= GameModeType.standard;
-        if (activeMode == GameModeType.superr) {
-          _handleSuperMode(roundLeader.$1);
+        if (activeMode.isBattleLevelMode) {
+          _handleBattleLevelMode(activeMode, roundLeader.$1);
           return;
         }
         final GameLevelMode modeObject =
@@ -197,9 +197,17 @@ class Game {
 
   /// super mode is handled separately
   /// because it has different logic
-  void _handleSuperMode(PlayerInterface roundLeader) {
-    final modeObject = SuperMode(players: players, roundLeader: roundLeader);
-    final result = modeObject.result;
+  void _handleBattleLevelMode(
+      GameModeType activeMode, PlayerInterface roundLeader) {
+    final BattleLevelMode object;
+    switch (activeMode) {
+      case GameModeType.superr:
+        object = SuperMode(players: players, roundLeader: roundLeader);
+        break;
+      default:
+        throw UnimplementedError();
+    }
+    final result = object.result;
     switch (result.leaderResult) {
       case ComparisonOutcome.win:
         for (var player in players) {
@@ -218,7 +226,7 @@ class Game {
       case ComparisonOutcome.tie:
         break;
     }
-    _updateSpecialModeState(GameModeType.superr);
+    _updateSpecialModeState(activeMode);
   }
 
   List<CricketCardInterface> get _selectedCardsInThisRound {

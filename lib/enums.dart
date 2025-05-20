@@ -74,6 +74,10 @@ enum GameModeType {
       GameModeType.worldCup => _standardDamage,
     };
   }
+
+  bool get isBattleLevelMode {
+    return this == GameModeType.superr;
+  }
 }
 
 GameModeType? getSpecialModeFromString(String input) {
