@@ -19,4 +19,3 @@ class CricketCardGameApp extends StatelessWidget {
   }
 }
 
-// Create UI for multiple inputs. (Check on mode selection)

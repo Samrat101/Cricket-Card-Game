@@ -85,11 +85,13 @@ class _GameScreenState extends State<GameScreen> {
                       height: 500.0,
                       color: Colors.white,
                       child: game.isRoundLeaderCardSelected() &&
-                              game.selectedAttribute == null
+                              ((game.selectedAttribute?.isEmpty ?? true) ||
+                                  (game.selectedAttribute?.length == 1 &&
+                                      game.askForSecondAttribute()))
                           ? buildAttributeSelector()
                           : Center(
                               child: Text(
-                                (winnerPlayers != null &&
+                                (winnerPlayers == null ||
                                         winnerPlayers!.isEmpty)
                                     ? '${game.currentTurnPlayer.name} Please Select A Card'
                                     : (winnerPlayers?.length == 1
@@ -149,7 +151,9 @@ class _GameScreenState extends State<GameScreen> {
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
         Text(
-            '${game.currentRoundLeader?.$1.name} Please select attribute to compare',
+            game.askForSecondAttribute()
+                ? '${game.currentRoundLeader?.$1.name} Please select second attribute to compare'
+                : '${game.currentRoundLeader?.$1.name} Please select attribute to compare',
             textAlign: TextAlign.center,
             style: const TextStyle(
               fontSize: 32,

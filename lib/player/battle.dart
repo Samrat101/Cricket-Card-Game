@@ -16,7 +16,7 @@ class Game {
   final List<CricketCardInterface> cards;
   final double _initialHealthForPlayers = 100;
   (PlayerInterface player, int index)? _currentRoundLeader;
-  CardAttributeType? selectedAttribute;
+  List<CardAttributeType>? selectedAttribute = [];
   int _currentTurnPlayerIndex = 0;
 
   Game(this.players, this.cards) {
@@ -52,7 +52,7 @@ class Game {
   }
 
   void _moveToNextRound() {
-    selectedAttribute = null;
+    selectedAttribute = [];
     for (var player in players) {
       for (var element in player.cards) {
         if (element.isSelected) {
@@ -128,6 +128,17 @@ class Game {
     return winners;
   }
 
+  bool askForSecondAttribute() {
+    if (currentRoundLeader?.$1.isSpecialModeActive == true) {
+      if (currentRoundLeader?.$1.specialMode == GameModeType.powerPlay) {
+        if (selectedAttribute?.length == 1) {
+          return true;
+        }
+      }
+    }
+    return false;
+  }
+
   void cardSelectedCallback(CricketCardInterface card) {
     _updateSelectedCard(card);
     if (_didAllPlayersSelectedCards()) {
@@ -141,7 +152,7 @@ class Game {
         element.updateCardSelectedStatus(false);
       }
     }
-    if (selectedAttribute != null) {
+    if (selectedAttribute?.isNotEmpty ?? true) {
       _moveTurnToNextPlayer();
     }
   }
@@ -180,8 +191,8 @@ class Game {
     player.toggleSpecialMode();
     if (player == currentRoundLeader?.$1 && player.isSpecialModeActive) {
       final mode = player.specialMode;
-      if (mode != null && mode.isBattleLevelMode) {
-        _handleBattleLevelMode(mode, player);
+      if (mode != null && mode.isDeckLevelMode) {
+        _handleDeckLevelMode(mode, player);
         _moveToNextRound();
       }
     }
@@ -194,8 +205,8 @@ class Game {
             ? roundLeader.$1.specialMode
             : null;
         activeMode ??= GameModeType.standard;
-        if (activeMode.isBattleLevelMode) {
-          _handleBattleLevelMode(activeMode, roundLeader.$1);
+        if (activeMode.isDeckLevelMode) {
+          _handleDeckLevelMode(activeMode, roundLeader.$1);
           return;
         }
         final RoundLevelMode modeObject =
@@ -208,7 +219,7 @@ class Game {
 
   /// super mode is handled separately
   /// because it has different logic
-  void _handleBattleLevelMode(
+  void _handleDeckLevelMode(
       GameModeType activeMode, PlayerInterface roundLeader) {
     final DeckLevelMode object;
     switch (activeMode) {
@@ -249,31 +260,31 @@ class Game {
   }
 
   RoundLevelMode _createModeObject(GameModeType gamMode,
-      PlayerInterface roundLeader, CardAttributeType attributeToCompare) {
+      PlayerInterface roundLeader, List<CardAttributeType> attributeToCompare) {
     switch (gamMode) {
       case GameModeType.standard:
         return StandardMode(
             cards: _selectedCardsInThisRound,
             roundLeaderCard: roundLeader.currentCard!,
-            cardAttributeType: attributeToCompare);
+            cardAttributeType: attributeToCompare.first);
       case GameModeType.powerPlay:
         return PowerPlayMode(
             cards: _selectedCardsInThisRound,
             roundLeaderCard: roundLeader.currentCard!,
-            cardAttributeType: attributeToCompare,
-            cardAttributeType2: attributeToCompare);
+            cardAttributeType: attributeToCompare.first,
+            cardAttributeType2: attributeToCompare.last);
       case GameModeType.freeHit:
         return FreeHitMode(
             cards: _selectedCardsInThisRound,
             roundLeaderCard: roundLeader.currentCard!,
-            cardAttributeType: attributeToCompare);
+            cardAttributeType: attributeToCompare.first);
       case GameModeType.worldCup:
         final isLastCardForActivePlayer =
             roundLeader.cards.where((e) => !e.isDiscarded).length == 1;
         return WorldCupMode(
             cards: _selectedCardsInThisRound,
             roundLeaderCard: roundLeader.currentCard!,
-            cardAttributeType: attributeToCompare,
+            cardAttributeType: attributeToCompare.first,
             isLastCardForActivePlayer: isLastCardForActivePlayer);
       default:
         throw UnimplementedError();
@@ -377,9 +388,12 @@ class Game {
   void attributeSelected(String attribute) {
     final attributeType = CardAttributeType.from(attribute);
     if (attributeType != null) {
-      selectedAttribute = attributeType;
+      selectedAttribute?.add(attributeType);
     }
     if (currentRoundLeader == null) {
+      return;
+    }
+    if (askForSecondAttribute()) {
       return;
     }
     _moveTurnToNextPlayer();
