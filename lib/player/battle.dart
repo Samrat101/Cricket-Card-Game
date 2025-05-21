@@ -145,7 +145,7 @@ class Game {
   void cardSelectedCallback(CricketCardInterface card) {
     _updateSelectedCard(card);
     if (_didAllPlayersSelectedCards()) {
-      _compareCards();
+      _compareCardsAndHandleHealthChanges();
       _resetCurrentCardsForPlayers();
       _moveToNextRound();
       return;
@@ -201,7 +201,7 @@ class Game {
     }
   }
 
-  void _compareCards() {
+  void _compareCardsAndHandleHealthChanges() {
     if (currentRoundLeader case final roundLeader?) {
       if (_selectedAttribute case final attributeToCompare?) {
         var activeMode = roundLeader.$1.isSpecialModeActive
