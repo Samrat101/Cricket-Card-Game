@@ -13,9 +13,10 @@ class Game {
   final List<PlayerInterface> players;
   final List<CricketCardInterface> cards;
   int _currentTurnPlayerIndex = 0;
-  List<CardAttributeType>? selectedAttribute = [];
+  List<CardAttributeType>? _selectedAttribute = [];
   Game(this.players, this.cards);
 
+  List<CardAttributeType>? get selectedAttribute => _selectedAttribute;
   PlayerInterface get currentTurnPlayer => players[_currentTurnPlayerIndex];
   PlayerInterface get _nextTurnPlayer =>
       players[_nextIndexInRound(afterIndex: _currentTurnPlayerIndex)];
@@ -37,7 +38,7 @@ class Game {
   }
 
   void _moveToNextRound() {
-    selectedAttribute = [];
+    _selectedAttribute = [];
     for (var player in players) {
       for (var element in player.cards) {
         if (element.isSelected) {
@@ -116,7 +117,7 @@ class Game {
   bool askForSecondAttribute() {
     if (currentRoundLeader?.$1.isSpecialModeActive == true) {
       if (currentRoundLeader?.$1.specialMode == GameModeType.powerPlay) {
-        if (selectedAttribute?.length == 1) {
+        if (_selectedAttribute?.length == 1) {
           return true;
         }
       }
@@ -137,7 +138,7 @@ class Game {
         element.updateCardSelectedStatus(false);
       }
     }
-    if (selectedAttribute?.isNotEmpty ?? true) {
+    if (_selectedAttribute?.isNotEmpty ?? true) {
       _moveTurnToNextPlayer();
     }
   }
@@ -174,7 +175,7 @@ class Game {
 
   void _compareCards() {
     if (currentRoundLeader case final roundLeader?) {
-      if (selectedAttribute case final attributeToCompare?) {
+      if (_selectedAttribute case final attributeToCompare?) {
         var activeMode = roundLeader.$1.isSpecialModeActive
             ? roundLeader.$1.specialMode
             : null;
@@ -315,7 +316,7 @@ class Game {
   void attributeSelected(String attribute) {
     final attributeType = CardAttributeType.from(attribute);
     if (attributeType != null) {
-      selectedAttribute?.add(attributeType);
+      _selectedAttribute?.add(attributeType);
     }
     if (currentRoundLeader == null) {
       return;
